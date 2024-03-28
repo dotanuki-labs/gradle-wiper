@@ -1,0 +1,67 @@
+# Copyright 2024 Dotanuki Labs
+# SPDX-License-Identifier: MIT
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  essential-checks:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Project Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Run essential checks
+        uses: dotanuki-labs/github-actions/essentials@main
+        with:
+          file-patterns: '*.sh,*.rs,*.yml'
+          license: 'mit'
+  build:
+    runs-on: ubuntu-22.04
+    needs: essential-checks
+
+    steps:
+      - name: Project Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Setup CI caching
+        uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
+        with:
+            save-if: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Install additional tools
+        run: |
+            sudo snap install --edge --classic just
+            sudo snap install zig --classic --beta && zig version
+
+      - name: Setup Rust and Cargo plugins
+        run: just setup-ci
+
+      - name: Check code smells
+        run: just lint
+
+      - name: Run tests
+        run: just tests
+
+      - name: Check supply-chain issues
+        run: just supply-chain-checks
+
+      - name: Build against supported targets
+        run: just cross-build-pull-request
+
+      - name: Archive SBOM
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        with:
+            name: sbom-${{ github.sha }}.json
+            path: gradle-tidy.cdx.json
+
+      - name: Archive binaries
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        with:
+            name: gradle-tidy-binaries
+            path: target/ci

@@ -1,0 +1,45 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "config:recommended",
+        "docker:pinDigests",
+        "helpers:pinGitHubActionDigests",
+        ":pinDevDependencies"
+    ],
+    "osvVulnerabilityAlerts": true,
+    "dependencyDashboard": true,
+    "labels": [
+        "dependencies"
+    ],
+    "packageRules": [
+        {
+            "description": [
+                "Rust"
+            ],
+            "matchPackageNames": [
+                "rust"
+            ],
+            "matchManagers": [
+                "custom.regex"
+            ],
+            "commitMessageTopic": "rust"
+        }
+    ],
+    "customManagers": [
+        {
+            "description": [
+                "Update Rust stable version in rust-toolchain.toml"
+            ],
+            "customType": "regex",
+            "fileMatch": [
+                "(^|/)rust-toolchain\\.toml$"
+            ],
+            "matchStrings": [
+                "channel\\s*=\\s*\"(?<currentValue>\\d+\\.\\d+(\\.\\d+)?)\""
+            ],
+            "depNameTemplate": "rust",
+            "packageNameTemplate": "rust-lang/rust",
+            "datasourceTemplate": "github-releases"
+        }
+    ]
+}

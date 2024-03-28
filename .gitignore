@@ -1,0 +1,8 @@
+# Rust builds
+/target
+gradle-tidy.cdx.json
+
+# IDE environment
+.DS_STORE
+.idea
+

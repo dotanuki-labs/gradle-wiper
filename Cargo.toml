@@ -1,0 +1,23 @@
+[package]
+name = "gradle-tidy"
+version = "0.1.0"
+edition = "2021"
+authors = ["ubiratan.f.soares@gmail.com"]
+description = "An opinionated way to kick-off CLI apps powered by Rust"
+repository = "https://github.com/dotanuki-labs/gradle-tidy"
+readme = "README.md"
+license = "MIT"
+publish = true
+categories = ["command-line-utilities"]
+
+[dependencies]
+anyhow = "1.0.81"
+assert_cmd = "2.0.14"
+clap = { version = "4.5.4", features = ["derive"] }
+human-panic = "1.2.3"
+predicates = "3.1.0"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1

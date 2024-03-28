@@ -1,0 +1,5 @@
+# Adapted from https://github.com/rust-lang/rust-clippy/blob/master/rustfmt.toml
+
+edition = "2021"
+max_width = 120
+match_block_trailing_comma = true

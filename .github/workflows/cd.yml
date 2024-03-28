@@ -1,0 +1,47 @@
+# Copyright 2024 Dotanuki Labs
+# SPDX-License-Identifier: MIT
+
+name: CD
+
+on: workflow_dispatch
+
+jobs:
+  release:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Project Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Install additional tools
+        run: |
+          sudo snap install --edge --classic just
+          sudo snap install zig --classic --beta && zig version
+
+      - name: Setup Rust and Cargo plugins
+        run: just setup-ci
+
+      - name: Check supply-chain issues
+        run: just supply-chain-checks
+
+      - name: Build against all supported targets
+        run: just cross-build-release
+
+      - name: Prepare to release
+        id: prepare-release
+        run: ./scripts/prepare-release.sh
+
+      - name: Publish on crates.io
+        run: cargo publish --token ${{ secrets.CRATESIO_PUBLISH_TOKEN }}
+
+      - name: Publish draft release on Github
+        uses: softprops/action-gh-release@9d7c94cfd0a1f3ed45544c887983e9fa900f0564 # v2.0.4
+        with:
+          name: ${{ steps.prepare-release.outputs.version }}
+          tag_name: ${{ steps.prepare-release.outputs.version }}
+          token: ${{ secrets.DOTANUKI_BOT_TOKEN }}
+          generate_release_notes: true
+          draft: true
+          files: |
+            target/ci/**/*
+            gradle-tidy.cdx.json

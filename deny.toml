@@ -1,0 +1,13 @@
+[advisories]
+ignore = [
+    # No advisories so far!
+]
+
+[licenses]
+confidence-threshold = 0.95
+allow = [
+    "Apache-2.0",
+    "MIT",
+    "Unicode-DFS-2016"
+]
+
