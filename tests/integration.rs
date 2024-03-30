@@ -10,24 +10,16 @@ fn sut() -> Command {
 
 #[test]
 fn should_parse_arguments() {
-    let execution = sut().args(["--name", "John"]).assert();
+    let execution = sut().args(["disk", "shallow"]).assert();
 
-    let expected = "Hello, John!\n";
-    execution.stdout(expected);
+    let expected = "Tidying disk resources";
+    execution.stdout(contains(expected));
 }
 
 #[test]
 fn should_show_help() {
-    let description = "An opinionated way to kick-off CLI apps powered by Rust";
+    let description = "Easily tidy machine resources (RAM, Disk) attached to Gradle builds";
 
-    let execution = sut().arg("--help").assert();
+    let execution = sut().arg("help").assert();
     execution.stdout(contains(description));
-}
-
-#[test]
-fn should_fail_without_arguments() {
-    let instruction = "required arguments were not provided";
-
-    let execution = sut().assert();
-    execution.failure().stderr(contains(instruction));
 }
