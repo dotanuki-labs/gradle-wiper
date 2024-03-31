@@ -2,18 +2,30 @@
 // SPDX-License-Identifier: MIT
 
 mod cli;
+mod models;
 
-use clap::Parser;
-use cli::{Cli, Commands};
-use human_panic::setup_panic;
+use crate::cli::Cli;
+use crate::models::UseCase::{GradleDaemon, KotlinDaemon};
+use crate::models::{ExecutionOutcome, MachineResource, ResourceAllocation};
 
 fn main() {
-    setup_panic!();
+    let cli = Cli::new();
+    let (machine_resources, action) = cli.parsed_arguments();
 
-    let cli = Cli::parse();
+    match machine_resources {
+        MachineResource::DiskSpace => {
+            let outcome = ExecutionOutcome::new(MachineResource::DiskSpace, 2400, 4);
+            cli.show_execution_outcome(&outcome);
+        },
+        MachineResource::RamMemory => {
+            let allocations = vec![
+                ResourceAllocation::new(KotlinDaemon, 440),
+                ResourceAllocation::new(KotlinDaemon, 410),
+                ResourceAllocation::new(GradleDaemon, 815),
+                ResourceAllocation::new(GradleDaemon, 750),
+            ];
 
-    match cli.command {
-        Commands::Disk(args) => println!("Tidying disk resources -> {:?}", args.mode),
-        Commands::Ram(args) => println!("Tidying memory resources -> {:?}", args.mode),
+            cli.show_allocated_resources(&allocations)
+        },
     }
 }
