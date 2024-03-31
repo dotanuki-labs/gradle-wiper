@@ -10,10 +10,10 @@ fn sut() -> Command {
 
 #[test]
 fn should_parse_arguments() {
-    let execution = sut().args(["disk", "shallow"]).assert();
+    let execution = sut().args(["disk", "unsupported"]).assert();
 
-    let expected = "Tidying disk resources";
-    execution.stdout(contains(expected));
+    let expected = "possible values: analyse, shallow, deep";
+    execution.stderr(contains(expected));
 }
 
 #[test]
