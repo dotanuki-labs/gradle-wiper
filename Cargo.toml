@@ -12,10 +12,12 @@ categories = ["command-line-utilities"]
 
 [dependencies]
 anyhow = "1.0.81"
-assert_cmd = "2.0.14"
 clap = { version = "4.5.4", features = ["derive"] }
 comfy-table = "7.1.0"
 human-panic = "1.2.3"
+
+[dev-dependencies]
+assert_cmd = "2.0.14"
 predicates = "3.1.0"
 
 [profile.release]
