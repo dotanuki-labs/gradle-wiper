@@ -1,10 +1,10 @@
 [package]
-name = "gradle-tidy"
+name = "gradle-wiper"
 version = "0.1.0"
 edition = "2021"
 authors = ["ubiratan.f.soares@gmail.com"]
-description = "Easily tidy machine resources (RAM, Disk) attached to Gradle builds "
-repository = "https://github.com/dotanuki-labs/gradle-tidy"
+description = "Reclaim machine resources (RAM, Disk) attached to Gradle builds "
+repository = "https://github.com/dotanuki-labs/gradle-wiper"
 readme = "README.md"
 license = "MIT"
 publish = true
@@ -15,6 +15,7 @@ anyhow = "1.0.81"
 clap = { version = "4.5.4", features = ["derive"] }
 comfy-table = "7.1.0"
 human-panic = "1.2.3"
+walkdir = "2.5.0"
 
 [dev-dependencies]
 assert_cmd = "2.0.14"

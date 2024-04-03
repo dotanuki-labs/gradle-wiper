@@ -12,10 +12,10 @@ cross_compile() {
     rustup target add "$target"
     cargo zigbuild --release --target "$target"
 
-    local binary="target/$target/release/gradle-tidy"
-    cp "$binary" "$output_dir"/gradle-tidy-"$target"
-    chmod +x "$output_dir"/gradle-tidy-"$target"
-    sha256sum "$binary" >>"$output_dir"/gradle-tidy-"$target"-sha256
+    local binary="target/$target/release/gradle-wiper"
+    cp "$binary" "$output_dir"/gradle-wiper-"$target"
+    chmod +x "$output_dir"/gradle-wiper-"$target"
+    sha256sum "$binary" >>"$output_dir"/gradle-wiper-"$target"-sha256
 }
 
 cross_build_full() {
