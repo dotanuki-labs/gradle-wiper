@@ -1,6 +1,6 @@
 # Rust builds
 /target
-gradle-tidy.cdx.json
+gradle-wiper.cdx.json
 
 # IDE environment
 .DS_STORE

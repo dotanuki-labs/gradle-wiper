@@ -44,4 +44,4 @@ jobs:
           draft: true
           files: |
             target/ci/**/*
-            gradle-tidy.cdx.json
+            gradle-wiper.cdx.json

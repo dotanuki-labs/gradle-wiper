@@ -1,4 +1,4 @@
-# gradle-tidy
+# gradle-wiper
 
 ## What
 
