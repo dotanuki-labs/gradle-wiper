@@ -31,7 +31,7 @@ lint: toolchain
     @echo
 
     @echo "→ Checking code smells (clippy)"
-    cargo clippy --all-targets --all-features
+    cargo clippy --all-targets --all-features -- -D warnings -W clippy::unwrap_used
     @echo
 
 # Build project against the local toolchain

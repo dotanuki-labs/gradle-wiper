@@ -5,7 +5,7 @@ use assert_cmd::Command;
 use predicates::str::contains;
 
 fn sut() -> Command {
-    Command::cargo_bin("gradle-wiper").unwrap()
+    Command::cargo_bin("gradle-wiper").expect("Should be able to instantiate a command")
 }
 
 #[test]
