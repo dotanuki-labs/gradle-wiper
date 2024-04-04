@@ -1,7 +1,7 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
-#[warn(dead_code)]
+#[allow(dead_code)]
 #[derive(Debug)]
 pub enum MachineResource {
     RamMemory,
@@ -15,6 +15,7 @@ pub enum TidyAction {
     DeepWiping,
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 pub enum UseCase {
     GradleBuildCache,

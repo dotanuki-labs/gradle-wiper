@@ -11,6 +11,7 @@ use crate::models::{ExecutionOutcome, MachineResource, ResourceAllocation};
 fn main() {
     let cli = Cli::new();
     let (machine_resources, action) = cli.parsed_arguments();
+    println!("Action -> {:?}", action);
 
     match machine_resources {
         MachineResource::DiskSpace => {
