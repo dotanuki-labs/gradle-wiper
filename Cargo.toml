@@ -14,10 +14,15 @@ categories = ["command-line-utilities"]
 anyhow = "1.0.81"
 clap = { version = "4.5.4", features = ["derive"] }
 comfy-table = "7.1.0"
+directories = "5.0.1"
 human-panic = "1.2.3"
+itertools = "0.12.1"
 walkdir = "2.5.0"
+uuid = { version = "1.7.0", features = ["v4"] }
 
 [dev-dependencies]
+tempdir = "0.3.7"
+fake = "2.9.2"
 assert_cmd = "2.0.14"
 predicates = "3.1.0"
 
