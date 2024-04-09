@@ -89,7 +89,7 @@ mod tests {
     use std::fs;
     use std::fs::File;
     use std::io::Write;
-    use tempdir::TempDir;
+    use temp_dir::TempDir;
     use uuid::Uuid;
 
     const CHARS: &str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -127,7 +127,7 @@ mod tests {
 
     #[test]
     fn should_handle_gradle_home_with_different_files() {
-        let temp_dir = TempDir::new("gradle-wiper-tests").expect("Cant create temp dir");
+        let temp_dir = TempDir::new().expect("Cant create temp dir");
 
         prepare_fake_gradle_home(&temp_dir);
 

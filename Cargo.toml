@@ -21,10 +21,10 @@ walkdir = "2.5.0"
 uuid = { version = "1.7.0", features = ["v4"] }
 
 [dev-dependencies]
-tempdir = "0.3.7"
 fake = "2.9.2"
 assert_cmd = "2.0.14"
 predicates = "3.1.0"
+temp-dir = "0.1.13"
 
 [profile.release]
 strip = true
