@@ -4,6 +4,7 @@
 mod cli;
 mod disk;
 mod models;
+mod filesystem;
 
 use crate::cli::Cli;
 use crate::models::MemoryCached::{GradleWorkerDaemon, KotlinCompilerDaemon};
