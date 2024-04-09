@@ -7,7 +7,6 @@ use std::path::Path;
 use ubyte::ByteUnit;
 use walkdir::{DirEntry, WalkDir};
 
-#[allow(dead_code)]
 pub fn usage_for_gradle_home(gradle_home: &Path) -> anyhow::Result<Vec<ResourceAllocation>> {
     // We trust that gradle_home == $HOME/.gradle
     let Ok(true) = gradle_home.try_exists() else {
@@ -29,12 +28,10 @@ pub fn usage_for_gradle_home(gradle_home: &Path) -> anyhow::Result<Vec<ResourceA
     Ok(total_per_use_case)
 }
 
-#[allow(dead_code)]
 fn size_for_entry(entry: &DirEntry) -> u64 {
     entry.metadata().expect("Expecting a valid metadata for entry").len()
 }
 
-#[allow(dead_code)]
 fn ensure_file(entry: &DirEntry) -> bool {
     entry
         .metadata()
@@ -42,7 +39,6 @@ fn ensure_file(entry: &DirEntry) -> bool {
         .is_file()
 }
 
-#[allow(dead_code)]
 fn evaluate_use_case_from_gradle_home(entry: &DirEntry) -> UseCase {
     let raw_path = entry
         .path()
@@ -133,7 +129,7 @@ mod tests {
         create_fake_1kb_file(&temp_dir, ".gradle/configuration-cache");
 
         let fake_gradle_home_path = temp_dir.path();
-        let use_cases = usage_for_gradle_home(fake_gradle_home_path).expect("Cannot compute use cases");
+        let usages = usage_for_gradle_home(fake_gradle_home_path).expect("Cannot compute use cases");
 
         let expected = vec![
             ResourceAllocation::new(UseCase::from(DiskCached::GradleCachedConfiguration), 1.kilobytes()),
@@ -141,6 +137,6 @@ mod tests {
             ResourceAllocation::new(UseCase::from(DiskCached::GradleDaemonLogs), 2.kilobytes()),
         ];
 
-        assert_eq!(use_cases, expected);
+        assert_eq!(usages, expected);
     }
 }

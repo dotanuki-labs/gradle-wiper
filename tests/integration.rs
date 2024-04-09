@@ -12,7 +12,7 @@ fn sut() -> Command {
 fn should_parse_arguments() {
     let execution = sut().args(["disk", "unsupported"]).assert();
 
-    let expected = "possible values: analyse, shallow, deep";
+    let expected = "possible values: evaluate, shallow, deep";
     execution.stderr(contains(expected));
 }
 
@@ -22,4 +22,12 @@ fn should_show_help() {
 
     let execution = sut().arg("help").assert();
     execution.stdout(contains(description));
+}
+
+#[test]
+fn should_evaluate_no_usages_of_ram_memory() {
+    let execution = sut().args(["ram", "evaluate"]).assert();
+
+    let expected = "No usages of RAM memory";
+    execution.success().stdout(contains(expected));
 }

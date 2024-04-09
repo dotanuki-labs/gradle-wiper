@@ -11,10 +11,10 @@ pub enum MachineResource {
 }
 
 #[derive(Debug)]
-pub enum TidyAction {
-    EvaluateResources,
-    ShallowWiping,
-    DeepWiping,
+pub enum WipeAction {
+    Evaluate,
+    ShallowWipe,
+    DeepWipe,
 }
 
 #[allow(dead_code)]
@@ -62,25 +62,23 @@ impl From<MemoryCached> for UseCase {
 #[derive(Debug, PartialEq, Ord, PartialOrd, Eq)]
 pub struct ResourceAllocation {
     pub use_case: UseCase,
-    pub megabytes: ByteUnit,
+    pub amount: ByteUnit,
 }
 
 impl ResourceAllocation {
-    pub fn new(what: UseCase, amount: ByteUnit) -> Self {
-        Self {
-            use_case: what,
-            megabytes: amount,
-        }
+    pub fn new(use_case: UseCase, amount: ByteUnit) -> Self {
+        Self { use_case, amount }
     }
 }
 
-pub struct ExecutionOutcome {
+pub struct WippingOutcome {
     pub subject: MachineResource,
     pub reclaimed_memory: ByteUnit,
     pub freed_entries: u32,
 }
 
-impl ExecutionOutcome {
+#[allow(dead_code)]
+impl WippingOutcome {
     pub fn new(subject: MachineResource, reclaimed_memory: ByteUnit, freed_entries: u32) -> Self {
         Self {
             subject,
@@ -88,4 +86,20 @@ impl ExecutionOutcome {
             freed_entries,
         }
     }
+}
+
+pub struct EvaluationOutcome {
+    pub allocated: Vec<ResourceAllocation>,
+}
+
+impl EvaluationOutcome {
+    pub fn new(allocated: Vec<ResourceAllocation>) -> Self {
+        Self { allocated }
+    }
+}
+
+#[allow(dead_code)]
+pub enum ExecutionOutcome {
+    Evaluation(EvaluationOutcome),
+    Wipping(WippingOutcome),
 }

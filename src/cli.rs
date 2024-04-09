@@ -1,7 +1,7 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
-use crate::models::{ExecutionOutcome, MachineResource, ResourceAllocation, TidyAction};
+use crate::models::{EvaluationOutcome, ExecutionOutcome, MachineResource, WipeAction, WippingOutcome};
 use clap::{Args, Parser, Subcommand, ValueEnum};
 use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
@@ -10,7 +10,7 @@ use human_panic::setup_panic;
 
 #[derive(ValueEnum, Debug, Clone)]
 enum ExecutionMode {
-    Analyse,
+    Evaluate,
     Shallow,
     Deep,
 }
@@ -21,12 +21,12 @@ struct WrappedArguments {
     pub mode: ExecutionMode,
 }
 
-impl From<WrappedArguments> for TidyAction {
+impl From<WrappedArguments> for WipeAction {
     fn from(value: WrappedArguments) -> Self {
         match value.mode {
-            ExecutionMode::Analyse => TidyAction::EvaluateResources,
-            ExecutionMode::Shallow => TidyAction::ShallowWiping,
-            ExecutionMode::Deep => TidyAction::DeepWiping,
+            ExecutionMode::Evaluate => WipeAction::Evaluate,
+            ExecutionMode::Shallow => WipeAction::ShallowWipe,
+            ExecutionMode::Deep => WipeAction::DeepWipe,
         }
     }
 }
@@ -53,19 +53,33 @@ impl Cli {
         Self {}
     }
 
-    pub fn parsed_arguments(&self) -> (MachineResource, TidyAction) {
+    pub fn parsed_arguments(&self) -> (MachineResource, WipeAction) {
         let cli = CliParser::parse();
         match cli.command {
-            Commands::Disk(args) => (MachineResource::DiskSpace, TidyAction::from(args)),
-            Commands::Ram(args) => (MachineResource::RamMemory, TidyAction::from(args)),
+            Commands::Disk(args) => (MachineResource::DiskSpace, WipeAction::from(args)),
+            Commands::Ram(args) => (MachineResource::RamMemory, WipeAction::from(args)),
         }
     }
 
-    pub fn show_allocated_resources(&self, allocated: &[ResourceAllocation]) {
+    fn report_resources(&self, resource: &MachineResource, outcome: &EvaluationOutcome) {
         println!();
+
+        let allocated = &outcome.allocated;
+
+        if allocated.is_empty() {
+            let what = match resource {
+                MachineResource::RamMemory => "RAM memory",
+                MachineResource::DiskSpace => "disk space",
+            };
+
+            println!("No usages of {} related to Gradle builds were found", what);
+            println!();
+            return;
+        }
+
         let rows = allocated
             .iter()
-            .map(|res| vec![format!("{:?}", res.use_case), format!("{:?}", res.megabytes)])
+            .map(|res| vec![format!("{:?}", res.use_case), format!("{}", res.amount)])
             .collect::<Vec<_>>();
 
         let mut table = Table::new();
@@ -74,14 +88,14 @@ impl Cli {
             .apply_modifier(UTF8_ROUND_CORNERS)
             .set_content_arrangement(ContentArrangement::Dynamic)
             .set_width(100)
-            .set_header(vec!["Allocation", "Amount (MB)"])
+            .set_header(vec!["Allocation", "Amount"])
             .add_rows(rows);
 
         println!("{table}");
         println!();
     }
 
-    pub fn show_execution_outcome(&self, outcome: &ExecutionOutcome) {
+    fn report_cleanup(&self, outcome: &WippingOutcome) {
         let resource_name = match outcome.subject {
             MachineResource::RamMemory => "system processes",
             MachineResource::DiskSpace => "files",
@@ -93,5 +107,14 @@ impl Cli {
             outcome.reclaimed_memory, outcome.freed_entries, resource_name
         );
         println!();
+    }
+
+    pub fn show_execution_outcome(&self, resource: &MachineResource, outcome: &ExecutionOutcome) -> anyhow::Result<()> {
+        match outcome {
+            ExecutionOutcome::Evaluation(evaluation) => self.report_resources(resource, evaluation),
+            ExecutionOutcome::Wipping(wipping) => self.report_cleanup(wipping),
+        }
+
+        Ok(())
     }
 }
