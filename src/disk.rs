@@ -18,11 +18,12 @@ pub fn usage_for_gradle_home(gradle_home: &Path) -> anyhow::Result<Vec<ResourceA
         .filter_map(|entry| entry.ok())
         .filter(ensure_file)
         .map(|entry| (size_for_entry(&entry), evaluate_use_case_from_gradle_home(&entry)))
-        .group_by(|item| item.1.clone())
+        .filter(|item| item.1 != UseCase::from(DiskCached::GradleOtherFiles))
+        .group_by(|item| item.1)
         .into_iter()
         .map(|(use_case, group)| (use_case, group.fold(0, |total, (entry_size, _)| total + entry_size)))
         .map(|(use_case, total)| ResourceAllocation::new(use_case, ByteUnit::from(total)))
-        .sorted_by_key(|item| item.use_case.clone())
+        .sorted_by_key(|item| item.use_case)
         .collect::<Vec<_>>();
 
     Ok(total_per_use_case)
@@ -48,12 +49,15 @@ fn evaluate_use_case_from_gradle_home(entry: &DirEntry) -> UseCase {
     // https://docs.gradle.org/current/userguide/configuration_cache.html
     // https://docs.gradle.org/current/userguide/directory_layout.html
     let cache_type = match raw_path {
-        _ if raw_path.contains(".gradle/caches") => DiskCached::GradleCacheBuildTask,
-        _ if raw_path.contains(".gradle/configuration-cache") => DiskCached::GradleCachedConfiguration,
+        _ if raw_path.contains(".gradle/caches") => DiskCached::GradleBuildCaching,
+        _ if raw_path.contains(".gradle/configuration-cache") => DiskCached::GradleConfigurationCaching,
         _ if raw_path.contains(".gradle/daemon") => DiskCached::GradleDaemonLogs,
-        _ if raw_path.contains(".gradle/jdks") => DiskCached::GradleCachedJDKToolchain,
-        _ if raw_path.contains(".gradle/wrapper") => DiskCached::GradleCachedDistribution,
-        _ => DiskCached::GradleOtherCaches,
+        _ if raw_path.contains(".gradle/jdks") => DiskCached::GradleJDKToolchains,
+        _ if raw_path.contains(".gradle/wrapper") => DiskCached::GradleDistributions,
+        _ if raw_path.contains(".gradle/.tmp") => DiskCached::GradleTemporaryFiles,
+        _ if raw_path.contains(".gradle/native") => DiskCached::GradleNativeFiles,
+        _ if raw_path.contains(".gradle/build-scan-data") => DiskCached::GradleBuildScans,
+        _ => DiskCached::GradleOtherFiles,
     };
 
     UseCase::from(cache_type)
@@ -132,8 +136,8 @@ mod tests {
         let usages = usage_for_gradle_home(fake_gradle_home_path).expect("Cannot compute use cases");
 
         let expected = vec![
-            ResourceAllocation::new(UseCase::from(DiskCached::GradleCachedConfiguration), 1.kilobytes()),
-            ResourceAllocation::new(UseCase::from(DiskCached::GradleCacheBuildTask), 3.kilobytes()),
+            ResourceAllocation::new(UseCase::from(DiskCached::GradleConfigurationCaching), 1.kilobytes()),
+            ResourceAllocation::new(UseCase::from(DiskCached::GradleBuildCaching), 3.kilobytes()),
             ResourceAllocation::new(UseCase::from(DiskCached::GradleDaemonLogs), 2.kilobytes()),
         ];
 
