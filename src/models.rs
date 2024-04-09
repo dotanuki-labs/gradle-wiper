@@ -1,6 +1,8 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
+use ubyte::ByteUnit;
+
 #[allow(dead_code)]
 #[derive(Debug)]
 pub enum MachineResource {
@@ -60,11 +62,11 @@ impl From<MemoryCached> for UseCase {
 #[derive(Debug, PartialEq, Ord, PartialOrd, Eq)]
 pub struct ResourceAllocation {
     pub use_case: UseCase,
-    pub megabytes: u64,
+    pub megabytes: ByteUnit,
 }
 
 impl ResourceAllocation {
-    pub fn new(what: UseCase, amount: u64) -> Self {
+    pub fn new(what: UseCase, amount: ByteUnit) -> Self {
         Self {
             use_case: what,
             megabytes: amount,
@@ -74,12 +76,12 @@ impl ResourceAllocation {
 
 pub struct ExecutionOutcome {
     pub subject: MachineResource,
-    pub reclaimed_memory: u64,
+    pub reclaimed_memory: ByteUnit,
     pub freed_entries: u32,
 }
 
 impl ExecutionOutcome {
-    pub fn new(subject: MachineResource, reclaimed_memory: u64, freed_entries: u32) -> Self {
+    pub fn new(subject: MachineResource, reclaimed_memory: ByteUnit, freed_entries: u32) -> Self {
         Self {
             subject,
             reclaimed_memory,

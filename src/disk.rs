@@ -4,10 +4,12 @@
 use crate::models::{DiskCached, ResourceAllocation, UseCase};
 use itertools::Itertools;
 use std::path::Path;
+use ubyte::ByteUnit;
 use walkdir::{DirEntry, WalkDir};
 
 #[allow(dead_code)]
 pub fn usage_for_gradle_home(gradle_home: &Path) -> anyhow::Result<Vec<ResourceAllocation>> {
+    // We trust that gradle_home == $HOME/.gradle
     let Ok(true) = gradle_home.try_exists() else {
         return Ok(vec![]);
     };
@@ -19,13 +21,8 @@ pub fn usage_for_gradle_home(gradle_home: &Path) -> anyhow::Result<Vec<ResourceA
         .map(|entry| (size_for_entry(&entry), evaluate_use_case_from_gradle_home(&entry)))
         .group_by(|item| item.1.clone())
         .into_iter()
-        .map(|(use_case, group)| {
-            (
-                use_case,
-                group.fold(0, |total, (entry_size, _)| total + entry_size / 1024),
-            )
-        })
-        .map(|(use_case, total_kb)| ResourceAllocation::new(use_case, total_kb))
+        .map(|(use_case, group)| (use_case, group.fold(0, |total, (entry_size, _)| total + entry_size)))
+        .map(|(use_case, total)| ResourceAllocation::new(use_case, ByteUnit::from(total)))
         .sorted_by_key(|item| item.use_case.clone())
         .collect::<Vec<_>>();
 
@@ -75,6 +72,7 @@ mod tests {
     use std::fs::File;
     use std::io::Write;
     use temp_dir::TempDir;
+    use ubyte::ToByteUnit;
     use uuid::Uuid;
 
     const CHARS: &str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -99,7 +97,7 @@ mod tests {
         let relative_path = format!("{}/{}", folder, file_name);
         let complete_path = gradle_home.path().join(relative_path);
 
-        let faker = StringFaker::with(Vec::from(CHARS), 1024);
+        let faker = StringFaker::with(Vec::from(CHARS), 1000);
         let fake: String = faker.fake();
         let mut fake_file = File::create(complete_path).expect("Cannot create temp file");
         fake_file
@@ -138,9 +136,9 @@ mod tests {
         let use_cases = usage_for_gradle_home(fake_gradle_home_path).expect("Cannot compute use cases");
 
         let expected = vec![
-            ResourceAllocation::new(UseCase::from(DiskCached::GradleCachedConfiguration), 1),
-            ResourceAllocation::new(UseCase::from(DiskCached::GradleCacheBuildTask), 3),
-            ResourceAllocation::new(UseCase::from(DiskCached::GradleDaemonLogs), 2),
+            ResourceAllocation::new(UseCase::from(DiskCached::GradleCachedConfiguration), 1.kilobytes()),
+            ResourceAllocation::new(UseCase::from(DiskCached::GradleCacheBuildTask), 3.kilobytes()),
+            ResourceAllocation::new(UseCase::from(DiskCached::GradleDaemonLogs), 2.kilobytes()),
         ];
 
         assert_eq!(use_cases, expected);

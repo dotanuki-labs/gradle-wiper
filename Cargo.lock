@@ -332,6 +332,7 @@ dependencies = [
  "itertools",
  "predicates",
  "temp-dir",
+ "ubyte",
  "uuid",
  "walkdir",
 ]
@@ -795,6 +796,12 @@ dependencies = [
  "serde_spanned",
  "toml_datetime",
 ]
+
+[[package]]
+name = "ubyte"
+version = "0.10.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f720def6ce1ee2fc44d40ac9ed6d3a59c361c80a75a7aa8e75bb9baed31cf2ea"
 
 [[package]]
 name = "unicode-ident"

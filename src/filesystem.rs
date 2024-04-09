@@ -1,9 +1,9 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
-use std::path::PathBuf;
 use anyhow::anyhow;
 use directories::BaseDirs;
+use std::path::PathBuf;
 
 #[allow(dead_code)]
 pub fn find_gradle_home() -> anyhow::Result<PathBuf> {
@@ -11,4 +11,3 @@ pub fn find_gradle_home() -> anyhow::Result<PathBuf> {
     let home_dir = base_dir.home_dir();
     Ok(home_dir.join(".gradle"))
 }
-
