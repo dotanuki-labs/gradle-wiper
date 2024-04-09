@@ -19,7 +19,7 @@ pub enum WipeAction {
 
 #[allow(dead_code)]
 #[allow(clippy::enum_variant_names)]
-#[derive(Debug, PartialEq, Eq, Hash, Clone, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, PartialOrd, Ord)]
 pub enum MemoryCached {
     GradleWorkerDaemon,
     KotlinCompilerDaemon,
@@ -27,20 +27,23 @@ pub enum MemoryCached {
 }
 
 #[allow(dead_code)]
-#[derive(Debug, PartialEq, Eq, Hash, Clone, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, PartialOrd, Ord)]
 pub enum DiskCached {
-    GradleCachedConfiguration,
-    GradleCacheBuildTask,
+    GradleConfigurationCaching,
+    GradleBuildCaching,
     GradleDaemonLogs,
-    GradleCachedJDKToolchain,
-    GradleCachedDistribution,
-    GradleOtherCaches,
+    GradleJDKToolchains,
+    GradleDistributions,
+    GradleTemporaryFiles,
+    GradleNativeFiles,
+    GradleBuildScans,
+    GradleOtherFiles,
     BuildOutputForGradleProject,
     MavenLocalStorage,
 }
 
 #[allow(dead_code)]
-#[derive(Debug, PartialEq, Eq, Hash, Clone, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, PartialOrd, Ord)]
 pub enum UseCase {
     Disk(DiskCached),
     Memory(MemoryCached),
