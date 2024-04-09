@@ -5,30 +5,13 @@ mod cli;
 mod disk;
 mod filesystem;
 mod models;
+mod wiper;
 
 use crate::cli::Cli;
-use crate::models::MemoryCached::{GradleWorkerDaemon, KotlinCompilerDaemon};
-use crate::models::{ExecutionOutcome, MachineResource, ResourceAllocation, UseCase};
-use ubyte::ToByteUnit;
 
-fn main() {
+fn main() -> anyhow::Result<()> {
     let cli = Cli::new();
-    let (machine_resources, _action) = cli.parsed_arguments();
-
-    match machine_resources {
-        MachineResource::DiskSpace => {
-            let outcome = ExecutionOutcome::new(MachineResource::DiskSpace, 2400.megabytes(), 4);
-            cli.show_execution_outcome(&outcome);
-        },
-        MachineResource::RamMemory => {
-            let allocations = vec![
-                ResourceAllocation::new(UseCase::from(KotlinCompilerDaemon), 440.megabytes()),
-                ResourceAllocation::new(UseCase::from(KotlinCompilerDaemon), 410.megabytes()),
-                ResourceAllocation::new(UseCase::from(GradleWorkerDaemon), 815.megabytes()),
-                ResourceAllocation::new(UseCase::from(GradleWorkerDaemon), 750.megabytes()),
-            ];
-
-            cli.show_allocated_resources(&allocations)
-        },
-    }
+    let (target_resource, wipe_action) = cli.parsed_arguments();
+    let outcome = wiper::execute(&target_resource, wipe_action)?;
+    cli.show_execution_outcome(&target_resource, &outcome)
 }
