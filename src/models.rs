@@ -16,19 +16,48 @@ pub enum TidyAction {
 }
 
 #[allow(dead_code)]
-#[derive(Debug)]
-pub enum UseCase {
-    GradleBuildCache,
-    GradleDaemonLogs,
-    MavenLocalRepository,
-    GradleProjectFiles,
-    IdeaProjectFiles,
-    GradleDaemon,
-    KotlinDaemon,
-    GroovyDaemon,
+#[allow(clippy::enum_variant_names)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, PartialOrd, Ord)]
+pub enum MemoryCached {
+    GradleWorkerDaemon,
+    KotlinCompilerDaemon,
+    GroovyCompilerDaemon,
 }
 
-#[derive(Debug)]
+#[allow(dead_code)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, PartialOrd, Ord)]
+pub enum DiskCached {
+    GradleCachedConfiguration,
+    GradleCacheBuildTask,
+    GradleDaemonLogs,
+    GradleCachedJDKToolchain,
+    GradleCachedDistribution,
+    GradleOtherCaches,
+    BuildOutputForGradleProject,
+    MavenLocalStorage,
+}
+
+#[allow(dead_code)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, PartialOrd, Ord)]
+pub enum UseCase {
+    Disk(DiskCached),
+    Memory(MemoryCached),
+}
+
+impl From<DiskCached> for UseCase {
+    fn from(value: DiskCached) -> Self {
+        UseCase::Disk(value)
+    }
+}
+
+#[allow(dead_code)]
+impl From<MemoryCached> for UseCase {
+    fn from(value: MemoryCached) -> Self {
+        UseCase::Memory(value)
+    }
+}
+
+#[derive(Debug, PartialEq, Ord, PartialOrd, Eq)]
 pub struct ResourceAllocation {
     pub use_case: UseCase,
     pub megabytes: u64,
