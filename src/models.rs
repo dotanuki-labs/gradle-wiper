@@ -68,7 +68,7 @@ impl Display for DiskCached {
             DiskCached::GradleBuildScans => "Gradle build-scans data",
             DiskCached::GradleOtherFiles => "Other files on Gradle Home",
             DiskCached::BuildOutputForGradleProject => "Build output on Gradle projects",
-            DiskCached::MavenLocalStorage => "Maven Local storage",
+            DiskCached::MavenLocalStorage => "Maven local repository",
         };
 
         formatter.write_str(name)
