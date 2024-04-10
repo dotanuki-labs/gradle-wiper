@@ -63,12 +63,12 @@ impl From<MemoryCached> for UseCase {
 }
 
 #[derive(Debug, PartialEq, Ord, PartialOrd, Eq)]
-pub struct ResourceAllocation {
+pub struct AllocatedResource {
     pub use_case: UseCase,
     pub amount: ByteUnit,
 }
 
-impl ResourceAllocation {
+impl AllocatedResource {
     pub fn new(use_case: UseCase, amount: ByteUnit) -> Self {
         Self { use_case, amount }
     }
@@ -92,12 +92,13 @@ impl WippingOutcome {
 }
 
 pub struct EvaluationOutcome {
-    pub allocated: Vec<ResourceAllocation>,
+    pub resources: Vec<AllocatedResource>,
+    pub total_size: ByteUnit,
 }
 
 impl EvaluationOutcome {
-    pub fn new(allocated: Vec<ResourceAllocation>) -> Self {
-        Self { allocated }
+    pub fn new(resources: Vec<AllocatedResource>, total_size: ByteUnit) -> Self {
+        Self { resources, total_size }
     }
 }
 

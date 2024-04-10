@@ -64,7 +64,7 @@ impl Cli {
     fn report_resources(&self, resource: &MachineResource, outcome: &EvaluationOutcome) {
         println!();
 
-        let allocated = &outcome.allocated;
+        let allocated = &outcome.resources;
 
         if allocated.is_empty() {
             let what = match resource {
@@ -91,6 +91,8 @@ impl Cli {
             .set_header(vec!["Allocation", "Amount"])
             .add_rows(rows);
 
+        table.add_row(vec!["Total", &outcome.total_size.to_string()]);
+
         println!("{table}");
         println!();
     }
@@ -103,7 +105,7 @@ impl Cli {
 
         println!();
         println!(
-            "Reclaimed {} Mb by deleting {} {}",
+            "Reclaimed {} by deleting {} {}",
             outcome.reclaimed_memory, outcome.freed_entries, resource_name
         );
         println!();

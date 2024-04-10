@@ -3,7 +3,8 @@
 
 use crate::disk::usage_for_gradle_home;
 use crate::filesystem::find_gradle_home;
-use crate::models::{EvaluationOutcome, ExecutionOutcome, MachineResource, ResourceAllocation, WipeAction};
+use crate::models::{AllocatedResource, EvaluationOutcome, ExecutionOutcome, MachineResource, WipeAction};
+use ubyte::{ByteUnit, ToByteUnit};
 use MachineResource::{DiskSpace, RamMemory};
 use WipeAction::{DeepWipe, Evaluate, ShallowWipe};
 
@@ -20,8 +21,8 @@ pub fn execute(target: &MachineResource, action: WipeAction) -> anyhow::Result<E
 
 fn evaluate_ram_memory() -> anyhow::Result<ExecutionOutcome> {
     // todo : real implementation to come
-    let allocated: Vec<ResourceAllocation> = vec![];
-    let outcome = EvaluationOutcome::new(allocated);
+    let resources: Vec<AllocatedResource> = vec![];
+    let outcome = EvaluationOutcome::new(resources, 0.megabytes());
     Ok(ExecutionOutcome::Evaluation(outcome))
 }
 
@@ -35,8 +36,9 @@ fn deep_wipe_ram() -> anyhow::Result<ExecutionOutcome> {
 
 fn evaluate_disk_space() -> anyhow::Result<ExecutionOutcome> {
     let gradle_home = find_gradle_home()?;
-    let allocated = usage_for_gradle_home(gradle_home.as_path())?;
-    let outcome = EvaluationOutcome::new(allocated);
+    let resources = usage_for_gradle_home(gradle_home.as_path())?;
+    let total_size = calculate_total_allocated(&resources);
+    let outcome = EvaluationOutcome::new(resources, total_size);
     Ok(ExecutionOutcome::Evaluation(outcome))
 }
 
@@ -46,4 +48,10 @@ fn shallow_wipe_disk() -> anyhow::Result<ExecutionOutcome> {
 
 fn deep_wipe_ram_disk() -> anyhow::Result<ExecutionOutcome> {
     todo!()
+}
+
+fn calculate_total_allocated(resources: &[AllocatedResource]) -> ByteUnit {
+    resources
+        .iter()
+        .fold(ByteUnit::from(0), |total, allocation| total + allocation.amount)
 }

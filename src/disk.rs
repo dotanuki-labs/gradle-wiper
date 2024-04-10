@@ -1,13 +1,13 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
-use crate::models::{DiskCached, ResourceAllocation, UseCase};
+use crate::models::{AllocatedResource, DiskCached, UseCase};
 use itertools::Itertools;
 use std::path::Path;
 use ubyte::ByteUnit;
 use walkdir::{DirEntry, WalkDir};
 
-pub fn usage_for_gradle_home(gradle_home: &Path) -> anyhow::Result<Vec<ResourceAllocation>> {
+pub fn usage_for_gradle_home(gradle_home: &Path) -> anyhow::Result<Vec<AllocatedResource>> {
     // We trust that gradle_home == $HOME/.gradle
     let Ok(true) = gradle_home.try_exists() else {
         return Ok(vec![]);
@@ -22,7 +22,7 @@ pub fn usage_for_gradle_home(gradle_home: &Path) -> anyhow::Result<Vec<ResourceA
         .group_by(|item| item.1)
         .into_iter()
         .map(|(use_case, group)| (use_case, group.fold(0, |total, (entry_size, _)| total + entry_size)))
-        .map(|(use_case, total)| ResourceAllocation::new(use_case, ByteUnit::from(total)))
+        .map(|(use_case, total)| AllocatedResource::new(use_case, ByteUnit::from(total)))
         .sorted_by_key(|item| item.use_case)
         .collect::<Vec<_>>();
 
@@ -66,7 +66,7 @@ fn evaluate_use_case_from_gradle_home(entry: &DirEntry) -> UseCase {
 #[cfg(test)]
 mod tests {
     use crate::disk::usage_for_gradle_home;
-    use crate::models::{DiskCached, ResourceAllocation, UseCase};
+    use crate::models::{AllocatedResource, DiskCached, UseCase};
     use fake::{Fake, StringFaker};
     use std::fs;
     use std::fs::File;
@@ -136,9 +136,9 @@ mod tests {
         let usages = usage_for_gradle_home(fake_gradle_home_path).expect("Cannot compute use cases");
 
         let expected = vec![
-            ResourceAllocation::new(UseCase::from(DiskCached::GradleConfigurationCaching), 1.kilobytes()),
-            ResourceAllocation::new(UseCase::from(DiskCached::GradleBuildCaching), 3.kilobytes()),
-            ResourceAllocation::new(UseCase::from(DiskCached::GradleDaemonLogs), 2.kilobytes()),
+            AllocatedResource::new(UseCase::from(DiskCached::GradleConfigurationCaching), 1.kilobytes()),
+            AllocatedResource::new(UseCase::from(DiskCached::GradleBuildCaching), 3.kilobytes()),
+            AllocatedResource::new(UseCase::from(DiskCached::GradleDaemonLogs), 2.kilobytes()),
         ];
 
         assert_eq!(usages, expected);
