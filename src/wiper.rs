@@ -1,8 +1,8 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
-use crate::disk::usage_for_gradle_home;
-use crate::filesystem::find_gradle_home;
+use crate::disk::{usage_for_gradle_home, usage_for_maven_local};
+use crate::filesystem::{find_gradle_home, find_maven_local_repository};
 use crate::models::{AllocatedResource, EvaluationOutcome, ExecutionOutcome, MachineResource, WipeAction};
 use ubyte::{ByteUnit, ToByteUnit};
 use MachineResource::{DiskSpace, RamMemory};
@@ -36,9 +36,20 @@ fn deep_wipe_ram() -> anyhow::Result<ExecutionOutcome> {
 
 fn evaluate_disk_space() -> anyhow::Result<ExecutionOutcome> {
     let gradle_home = find_gradle_home()?;
-    let resources = usage_for_gradle_home(gradle_home.as_path())?;
-    let total_size = calculate_total_allocated(&resources);
-    let outcome = EvaluationOutcome::new(resources, total_size);
+    let gradle_home_resources = usage_for_gradle_home(gradle_home.as_path())?;
+    let total_size_for_gradle_home = calculate_total_allocated(&gradle_home_resources);
+
+    let maven_local_repository = find_maven_local_repository()?;
+    let maven_local_resources = usage_for_maven_local(maven_local_repository.as_path())?;
+    let total_size_for_maven_local = maven_local_resources.amount;
+
+    let mut disk_resources: Vec<AllocatedResource> = Vec::new();
+    disk_resources.extend(gradle_home_resources);
+    disk_resources.push(maven_local_resources);
+
+    let total_size_on_disk = total_size_for_gradle_home + total_size_for_maven_local;
+
+    let outcome = EvaluationOutcome::new(disk_resources, total_size_on_disk);
     Ok(ExecutionOutcome::Evaluation(outcome))
 }
 

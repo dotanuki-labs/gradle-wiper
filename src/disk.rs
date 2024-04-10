@@ -7,6 +7,23 @@ use std::path::Path;
 use ubyte::ByteUnit;
 use walkdir::{DirEntry, WalkDir};
 
+pub fn usage_for_maven_local(maven_local: &Path) -> anyhow::Result<AllocatedResource> {
+    // We trust that gradle_home == $HOME/.m2
+    let use_case = UseCase::from(DiskCached::MavenLocalStorage);
+    let Ok(true) = maven_local.try_exists() else {
+        return Ok(AllocatedResource::new(use_case, ByteUnit::from(0)));
+    };
+
+    let total_amount = WalkDir::new(maven_local)
+        .into_iter()
+        .filter_map(|entry| entry.ok())
+        .filter(ensure_file)
+        .map(|entry| size_for_entry(&entry))
+        .sum::<u64>();
+
+    Ok(AllocatedResource::new(use_case, ByteUnit::from(total_amount)))
+}
+
 pub fn usage_for_gradle_home(gradle_home: &Path) -> anyhow::Result<Vec<AllocatedResource>> {
     // We trust that gradle_home == $HOME/.gradle
     let Ok(true) = gradle_home.try_exists() else {
@@ -65,14 +82,14 @@ fn evaluate_use_case_from_gradle_home(entry: &DirEntry) -> UseCase {
 
 #[cfg(test)]
 mod tests {
-    use crate::disk::usage_for_gradle_home;
+    use crate::disk::{usage_for_gradle_home, usage_for_maven_local};
     use crate::models::{AllocatedResource, DiskCached, UseCase};
     use fake::{Fake, StringFaker};
     use std::fs;
     use std::fs::File;
     use std::io::Write;
     use temp_dir::TempDir;
-    use ubyte::ToByteUnit;
+    use ubyte::{ByteUnit, ToByteUnit};
     use uuid::Uuid;
 
     const CHARS: &str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -107,17 +124,17 @@ mod tests {
     }
 
     #[test]
-    fn should_track_no_use_cases_when_missing_gradle_home_() {
+    fn should_compute_no_resources_when_missing_gradle_home() {
         let temp_dir = TempDir::new().expect("Cant create temp dir");
         let fake_gradle_home_path = temp_dir.path();
 
-        let use_cases = usage_for_gradle_home(fake_gradle_home_path).expect("Cannot compute use cases");
+        let usages = usage_for_gradle_home(fake_gradle_home_path).expect("Cannot compute use cases");
 
-        assert!(use_cases.is_empty())
+        assert!(usages.is_empty())
     }
 
     #[test]
-    fn should_handle_gradle_home_with_different_files() {
+    fn should_compute_resources_when_gradle_home_has_different_caches() {
         let temp_dir = TempDir::new().expect("Cant create temp dir");
 
         prepare_fake_gradle_home(&temp_dir);
@@ -142,5 +159,35 @@ mod tests {
         ];
 
         assert_eq!(usages, expected);
+    }
+
+    #[test]
+    fn should_compute_no_resources_when_missing_maven_local() {
+        let temp_dir = TempDir::new().expect("Cant create temp dir");
+        let fake_maven_local_path = temp_dir.path();
+
+        let usage = usage_for_maven_local(fake_maven_local_path).expect("Cannot compute use cases");
+
+        let use_case = UseCase::from(DiskCached::MavenLocalStorage);
+        let expected = AllocatedResource::new(use_case, ByteUnit::from(0));
+        assert_eq!(usage, expected)
+    }
+
+    #[test]
+    fn should_compute_resources_when_maven_local_present() {
+        let temp_dir = TempDir::new().expect("Cant create temp dir");
+        let fake_maven_local_path = temp_dir.path();
+
+        fs::create_dir(temp_dir.path().join(".m2")).expect("Cant create temporary fixture folder");
+
+        for _ in 0..2 {
+            create_fake_1kb_file(&temp_dir, ".m2");
+        }
+
+        let usage = usage_for_maven_local(fake_maven_local_path).expect("Cannot compute use cases");
+
+        let use_case = UseCase::from(DiskCached::MavenLocalStorage);
+        let expected = AllocatedResource::new(use_case, 2.kilobytes());
+        assert_eq!(usage, expected)
     }
 }
