@@ -79,7 +79,7 @@ impl Cli {
 
         let rows = allocated
             .iter()
-            .map(|res| vec![format!("{:?}", res.use_case), format!("{}", res.amount)])
+            .map(|res| vec![format!("{}", res.use_case), format!("{}", res.amount)])
             .collect::<Vec<_>>();
 
         let mut table = Table::new();
@@ -88,7 +88,7 @@ impl Cli {
             .apply_modifier(UTF8_ROUND_CORNERS)
             .set_content_arrangement(ContentArrangement::Dynamic)
             .set_width(100)
-            .set_header(vec!["Allocation", "Amount"])
+            .set_header(vec!["What", "Total Size"])
             .add_rows(rows);
 
         table.add_row(vec!["Total", &outcome.total_size.to_string()]);

@@ -1,6 +1,7 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
+use std::fmt::{Display, Formatter};
 use ubyte::ByteUnit;
 
 #[allow(dead_code)]
@@ -26,6 +27,18 @@ pub enum MemoryCached {
     GroovyCompilerDaemon,
 }
 
+impl Display for MemoryCached {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+        let name = match self {
+            MemoryCached::GradleWorkerDaemon => "Gradle Daemon",
+            MemoryCached::KotlinCompilerDaemon => "Kotlin Daemon",
+            MemoryCached::GroovyCompilerDaemon => "Groovy Daemon",
+        };
+
+        formatter.write_str(name)
+    }
+}
+
 #[allow(dead_code)]
 #[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, PartialOrd, Ord)]
 pub enum DiskCached {
@@ -42,11 +55,41 @@ pub enum DiskCached {
     MavenLocalStorage,
 }
 
-#[allow(dead_code)]
+impl Display for DiskCached {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+        let name = match self {
+            DiskCached::GradleConfigurationCaching => "Gradle Configuration Caches",
+            DiskCached::GradleBuildCaching => "Gradle Build Caches",
+            DiskCached::GradleDaemonLogs => "Gradle Daemon Logs",
+            DiskCached::GradleJDKToolchains => "Gradle JDK toolchains",
+            DiskCached::GradleDistributions => "Gradle Distributions",
+            DiskCached::GradleTemporaryFiles => "Gradle Temporary Files",
+            DiskCached::GradleNativeFiles => "Gradle platform-native caches",
+            DiskCached::GradleBuildScans => "Gradle build-scans data",
+            DiskCached::GradleOtherFiles => "Other files on Gradle Home",
+            DiskCached::BuildOutputForGradleProject => "Build output on Gradle projects",
+            DiskCached::MavenLocalStorage => "Maven Local storage",
+        };
+
+        formatter.write_str(name)
+    }
+}
+
 #[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, PartialOrd, Ord)]
 pub enum UseCase {
     Disk(DiskCached),
     Memory(MemoryCached),
+}
+
+impl Display for UseCase {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+        let inner = match self {
+            UseCase::Disk(disk_cached) => disk_cached.to_string(),
+            UseCase::Memory(memory_cached) => memory_cached.to_string(),
+        };
+
+        formatter.write_str(&inner)
+    }
 }
 
 impl From<DiskCached> for UseCase {
