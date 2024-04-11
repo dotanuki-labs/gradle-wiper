@@ -4,7 +4,6 @@
 use std::fmt::{Display, Formatter};
 use ubyte::ByteUnit;
 
-#[allow(dead_code)]
 #[derive(Debug)]
 pub enum MachineResource {
     RamMemory,
@@ -39,7 +38,6 @@ impl Display for MemoryCached {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, PartialOrd, Ord)]
 pub enum DiskCached {
     GradleConfigurationCaching,
@@ -67,7 +65,7 @@ impl Display for DiskCached {
             DiskCached::GradleNativeFiles => "Gradle platform-native caches",
             DiskCached::GradleBuildScans => "Gradle build-scans data",
             DiskCached::GradleOtherFiles => "Other files on Gradle Home",
-            DiskCached::BuildOutputForGradleProject => "Build output on Gradle projects",
+            DiskCached::BuildOutputForGradleProject => "Build artifacts on projects",
             DiskCached::MavenLocalStorage => "Maven local repository",
         };
 
