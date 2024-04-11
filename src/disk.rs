@@ -3,13 +3,45 @@
 
 use crate::models::{AllocatedResource, DiskCached, UseCase};
 use itertools::Itertools;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use ubyte::ByteUnit;
 use walkdir::{DirEntry, WalkDir};
 
+pub fn usage_for_gradle_projects(projects: &[PathBuf]) -> anyhow::Result<AllocatedResource> {
+    let use_case = UseCase::from(DiskCached::BuildOutputForGradleProject);
+    let allocated = projects
+        .iter()
+        .map(|project| usage_for_gradle_project(project.as_path()))
+        .collect::<anyhow::Result<Vec<AllocatedResource>>>()?;
+
+    let total_amount = allocated
+        .iter()
+        .fold(ByteUnit::from(0), |total, allocation| total + allocation.amount);
+
+    Ok(AllocatedResource::new(use_case, total_amount))
+}
+
+fn usage_for_gradle_project(gradle_project: &Path) -> anyhow::Result<AllocatedResource> {
+    let use_case = UseCase::from(DiskCached::BuildOutputForGradleProject);
+
+    let Ok(true) = gradle_project.try_exists() else {
+        return Ok(AllocatedResource::new(use_case, ByteUnit::from(0)));
+    };
+
+    let total = WalkDir::new(gradle_project)
+        .into_iter()
+        .filter_map(|entry| entry.ok())
+        .filter(ensure_build_output_file)
+        .map(|entry| size_for_entry(&entry))
+        .sum::<u64>();
+
+    Ok(AllocatedResource::new(use_case, ByteUnit::from(total)))
+}
+
 pub fn usage_for_maven_local(maven_local: &Path) -> anyhow::Result<AllocatedResource> {
-    // We trust that gradle_home == $HOME/.m2
+    // We trust that M2 local repository lives under $HOME/.m2
     let use_case = UseCase::from(DiskCached::MavenLocalStorage);
+
     let Ok(true) = maven_local.try_exists() else {
         return Ok(AllocatedResource::new(use_case, ByteUnit::from(0)));
     };
@@ -57,6 +89,18 @@ fn ensure_file(entry: &DirEntry) -> bool {
         .is_file()
 }
 
+fn ensure_build_output_file(entry: &DirEntry) -> bool {
+    let path = entry.path().to_str().expect("Expecting a valid path");
+    let build_output = path.contains("build/");
+
+    let build_output_file = entry
+        .metadata()
+        .expect("Expecting a valid metadata for entry")
+        .is_file();
+
+    build_output && build_output_file
+}
+
 fn evaluate_use_case_from_gradle_home(entry: &DirEntry) -> UseCase {
     let raw_path = entry
         .path()
@@ -82,7 +126,7 @@ fn evaluate_use_case_from_gradle_home(entry: &DirEntry) -> UseCase {
 
 #[cfg(test)]
 mod tests {
-    use crate::disk::{usage_for_gradle_home, usage_for_maven_local};
+    use crate::disk::{usage_for_gradle_home, usage_for_gradle_projects, usage_for_maven_local};
     use crate::models::{AllocatedResource, DiskCached, UseCase};
     use fake::{Fake, StringFaker};
     use std::fs;
@@ -106,6 +150,29 @@ mod tests {
 
         for folder in folders {
             fs::create_dir(dir.path().join(folder)).expect("Cant create temporary fixture folder");
+        }
+    }
+
+    fn prepare_fake_gradle_projects(dir: &TempDir) {
+        let folders = vec![
+            "AndroidStudioProjects",
+            "AndroidStudioProjects/my-project",
+            "AndroidStudioProjects/my-project/build",
+        ];
+
+        for folder in folders {
+            fs::create_dir(dir.path().join(folder)).expect("Cant create temporary fixture folder");
+        }
+
+        let files = vec![
+            "AndroidStudioProjects/my-project/settings.gradle",
+            "AndroidStudioProjects/my-project/build.gradle",
+            "AndroidStudioProjects/my-project/gradlew",
+            "AndroidStudioProjects/my-project/gradle.properties",
+        ];
+
+        for file in files {
+            fs::write(dir.path().join(file), "foo").expect("Cant create fixture file");
         }
     }
 
@@ -188,6 +255,37 @@ mod tests {
 
         let use_case = UseCase::from(DiskCached::MavenLocalStorage);
         let expected = AllocatedResource::new(use_case, 2.kilobytes());
+        assert_eq!(usage, expected)
+    }
+
+    #[test]
+    fn should_compute_no_resources_when_missing_gradle_projects() {
+        let temp_dir = TempDir::new().expect("Cant create temp dir");
+        let fake_android_studio_projects_path = vec![temp_dir.path().to_path_buf()];
+
+        let usage = usage_for_gradle_projects(&fake_android_studio_projects_path).expect("Cannot compute use cases");
+
+        let use_case = UseCase::from(DiskCached::BuildOutputForGradleProject);
+        let expected = AllocatedResource::new(use_case, ByteUnit::from(0));
+        assert_eq!(usage, expected)
+    }
+
+    #[test]
+    fn should_compute_resources_when_gradle_projects_present() {
+        let temp_dir = TempDir::new().expect("Cant create temp dir");
+
+        prepare_fake_gradle_projects(&temp_dir);
+
+        for _ in 0..5 {
+            create_fake_1kb_file(&temp_dir, "AndroidStudioProjects/my-project/build");
+        }
+
+        let fake_android_studio_projects_path = vec![temp_dir.path().to_path_buf()];
+
+        let usage = usage_for_gradle_projects(&fake_android_studio_projects_path).expect("Cannot compute use cases");
+
+        let use_case = UseCase::from(DiskCached::BuildOutputForGradleProject);
+        let expected = AllocatedResource::new(use_case, 5.kilobytes());
         assert_eq!(usage, expected)
     }
 }
