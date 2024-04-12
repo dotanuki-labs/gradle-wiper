@@ -39,7 +39,7 @@ impl Display for MemoryCached {
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, PartialOrd, Ord)]
-pub enum DiskCached {
+pub enum UserLevelDiskCache {
     GradleConfigurationCaching,
     GradleBuildCaching,
     GradleDaemonLogs,
@@ -48,28 +48,63 @@ pub enum DiskCached {
     GradleTemporaryFiles,
     GradleNativeFiles,
     GradleBuildScans,
-    GradleOtherFiles,
-    BuildOutputForGradleProject,
-    MavenLocalStorage,
+    GradleOtherCaches,
+    MavenLocalRepository,
+}
+
+impl Display for UserLevelDiskCache {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+        let name = match self {
+            UserLevelDiskCache::GradleConfigurationCaching => "Gradle Configuration Caches",
+            UserLevelDiskCache::GradleBuildCaching => "Gradle Build Caches",
+            UserLevelDiskCache::GradleDaemonLogs => "Gradle Daemon Logs",
+            UserLevelDiskCache::GradleJDKToolchains => "Gradle JDK toolchains",
+            UserLevelDiskCache::GradleDistributions => "Gradle Distributions",
+            UserLevelDiskCache::GradleTemporaryFiles => "Gradle Temporary Files",
+            UserLevelDiskCache::GradleNativeFiles => "Gradle platform-native caches",
+            UserLevelDiskCache::GradleBuildScans => "Gradle build-scans data",
+            UserLevelDiskCache::GradleOtherCaches => "Other files on Gradle Home",
+            UserLevelDiskCache::MavenLocalRepository => "Maven local repository",
+        };
+
+        formatter.write_str(name)
+    }
+}
+
+#[allow(dead_code)]
+#[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, PartialOrd, Ord)]
+pub enum ProjectLevelDiskCache {
+    BuildOutput,
+    GradleMetadata,
+    IdeaMetadata,
+}
+
+impl Display for ProjectLevelDiskCache {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+        let name = match self {
+            ProjectLevelDiskCache::BuildOutput => "Build output files",
+            ProjectLevelDiskCache::GradleMetadata => "Gradle metadata",
+            ProjectLevelDiskCache::IdeaMetadata => "Idea metadata",
+        };
+
+        formatter.write_str(name)
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, PartialOrd, Ord)]
+pub enum DiskCached {
+    Shared(UserLevelDiskCache),
+    Standalone(ProjectLevelDiskCache),
 }
 
 impl Display for DiskCached {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         let name = match self {
-            DiskCached::GradleConfigurationCaching => "Gradle Configuration Caches",
-            DiskCached::GradleBuildCaching => "Gradle Build Caches",
-            DiskCached::GradleDaemonLogs => "Gradle Daemon Logs",
-            DiskCached::GradleJDKToolchains => "Gradle JDK toolchains",
-            DiskCached::GradleDistributions => "Gradle Distributions",
-            DiskCached::GradleTemporaryFiles => "Gradle Temporary Files",
-            DiskCached::GradleNativeFiles => "Gradle platform-native caches",
-            DiskCached::GradleBuildScans => "Gradle build-scans data",
-            DiskCached::GradleOtherFiles => "Other files on Gradle Home",
-            DiskCached::BuildOutputForGradleProject => "Build artifacts on projects",
-            DiskCached::MavenLocalStorage => "Maven local repository",
+            DiskCached::Shared(user_level) => user_level.to_string(),
+            DiskCached::Standalone(project_level) => project_level.to_string(),
         };
 
-        formatter.write_str(name)
+        formatter.write_str(&name)
     }
 }
 
@@ -90,9 +125,15 @@ impl Display for UseCase {
     }
 }
 
-impl From<DiskCached> for UseCase {
-    fn from(value: DiskCached) -> Self {
-        UseCase::Disk(value)
+impl From<ProjectLevelDiskCache> for UseCase {
+    fn from(value: ProjectLevelDiskCache) -> Self {
+        UseCase::Disk(DiskCached::Standalone(value))
+    }
+}
+
+impl From<UserLevelDiskCache> for UseCase {
+    fn from(value: UserLevelDiskCache) -> Self {
+        UseCase::Disk(DiskCached::Shared(value))
     }
 }
 
