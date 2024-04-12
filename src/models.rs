@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 use std::fmt::{Display, Formatter};
+use std::path::PathBuf;
 use ubyte::ByteUnit;
 
 #[derive(Debug)]
@@ -68,6 +69,29 @@ impl Display for UserLevelDiskCache {
         };
 
         formatter.write_str(name)
+    }
+}
+
+impl UserLevelDiskCache {
+    pub fn path_relative_to_user_home(&self) -> Option<PathBuf> {
+        let raw_path = match self {
+            UserLevelDiskCache::GradleConfigurationCaching => ".gradle/configuration-cache",
+            UserLevelDiskCache::GradleBuildCaching => ".gradle/caches",
+            UserLevelDiskCache::GradleDaemonLogs => ".gradle/daemon",
+            UserLevelDiskCache::GradleJDKToolchains => ".gradle/jdks",
+            UserLevelDiskCache::GradleDistributions => ".gradle/wrapper",
+            UserLevelDiskCache::GradleTemporaryFiles => ".gradle/.tmp",
+            UserLevelDiskCache::GradleNativeFiles => ".gradle/native",
+            UserLevelDiskCache::GradleBuildScans => ".gradle/build-scan-data",
+            UserLevelDiskCache::MavenLocalRepository => ".m2",
+            UserLevelDiskCache::GradleOtherCaches => "",
+        };
+
+        if raw_path.is_empty() {
+            return None;
+        };
+
+        Some(PathBuf::from(raw_path))
     }
 }
 
@@ -156,20 +180,15 @@ impl AllocatedResource {
     }
 }
 
-pub struct WippingOutcome {
+pub struct WipingOutcome {
     pub subject: MachineResource,
-    pub reclaimed_memory: ByteUnit,
-    pub freed_entries: u32,
+    pub reclaimed: ByteUnit,
 }
 
 #[allow(dead_code)]
-impl WippingOutcome {
-    pub fn new(subject: MachineResource, reclaimed_memory: ByteUnit, freed_entries: u32) -> Self {
-        Self {
-            subject,
-            reclaimed_memory,
-            freed_entries,
-        }
+impl WipingOutcome {
+    pub fn new(subject: MachineResource, reclaimed: ByteUnit) -> Self {
+        Self { subject, reclaimed }
     }
 }
 
@@ -187,5 +206,5 @@ impl EvaluationOutcome {
 #[allow(dead_code)]
 pub enum ExecutionOutcome {
     Evaluation(EvaluationOutcome),
-    Wipping(WippingOutcome),
+    Wiping(WipingOutcome),
 }

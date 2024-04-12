@@ -2,8 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 use crate::disk::{usage_for_gradle_home, usage_for_gradle_projects, usage_for_maven_local};
+use crate::filesystem;
 use crate::filesystem::{find_all_gradle_projects, find_gradle_home, find_maven_local_repository};
-use crate::models::{AllocatedResource, EvaluationOutcome, ExecutionOutcome, MachineResource, WipeAction};
+use crate::models::{
+    AllocatedResource, DiskCached, EvaluationOutcome, ExecutionOutcome, MachineResource, UserLevelDiskCache,
+    WipeAction, WipingOutcome,
+};
 use ubyte::{ByteUnit, ToByteUnit};
 use MachineResource::{DiskSpace, RamMemory};
 use WipeAction::{DeepWipe, Evaluate, ShallowWipe};
@@ -58,7 +62,28 @@ fn evaluate_disk_space() -> anyhow::Result<ExecutionOutcome> {
 }
 
 fn shallow_wipe_disk() -> anyhow::Result<ExecutionOutcome> {
-    todo!()
+    let before_cleaning = match evaluate_disk_space()? {
+        ExecutionOutcome::Evaluation(outcome) => outcome.total_size,
+        ExecutionOutcome::Wiping(_) => panic!("Expecting an evaluation, not a wipping"),
+    };
+
+    let caches_to_remove = vec![
+        DiskCached::Shared(UserLevelDiskCache::GradleBuildCaching),
+        DiskCached::Shared(UserLevelDiskCache::GradleConfigurationCaching),
+        DiskCached::Shared(UserLevelDiskCache::GradleDaemonLogs),
+        DiskCached::Shared(UserLevelDiskCache::GradleTemporaryFiles),
+        DiskCached::Shared(UserLevelDiskCache::MavenLocalRepository),
+    ];
+
+    filesystem::perform_cleanup(&caches_to_remove);
+
+    let after_cleaning = match evaluate_disk_space()? {
+        ExecutionOutcome::Evaluation(outcome) => outcome.total_size,
+        ExecutionOutcome::Wiping(_) => panic!("Expecting an evaluation, not a wipping"),
+    };
+
+    let outcome = WipingOutcome::new(DiskSpace, before_cleaning - after_cleaning);
+    Ok(ExecutionOutcome::Wiping(outcome))
 }
 
 fn deep_wipe_ram_disk() -> anyhow::Result<ExecutionOutcome> {
