@@ -1,14 +1,14 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
-use crate::models::{AllocatedResource, DiskCached, UseCase};
+use crate::models::{AllocatedResource, ProjectLevelDiskCache, UseCase, UserLevelDiskCache};
 use itertools::Itertools;
 use std::path::{Path, PathBuf};
 use ubyte::ByteUnit;
 use walkdir::{DirEntry, WalkDir};
 
 pub fn usage_for_gradle_projects(projects: &[PathBuf]) -> anyhow::Result<AllocatedResource> {
-    let use_case = UseCase::from(DiskCached::BuildOutputForGradleProject);
+    let use_case = UseCase::from(ProjectLevelDiskCache::BuildOutput);
     let allocated = projects
         .iter()
         .map(|project| usage_for_gradle_project(project.as_path()))
@@ -22,7 +22,7 @@ pub fn usage_for_gradle_projects(projects: &[PathBuf]) -> anyhow::Result<Allocat
 }
 
 fn usage_for_gradle_project(gradle_project: &Path) -> anyhow::Result<AllocatedResource> {
-    let use_case = UseCase::from(DiskCached::BuildOutputForGradleProject);
+    let use_case = UseCase::from(ProjectLevelDiskCache::BuildOutput);
 
     let Ok(true) = gradle_project.try_exists() else {
         return Ok(AllocatedResource::new(use_case, ByteUnit::from(0)));
@@ -40,7 +40,7 @@ fn usage_for_gradle_project(gradle_project: &Path) -> anyhow::Result<AllocatedRe
 
 pub fn usage_for_maven_local(maven_local: &Path) -> anyhow::Result<AllocatedResource> {
     // We trust that M2 local repository lives under $HOME/.m2
-    let use_case = UseCase::from(DiskCached::MavenLocalStorage);
+    let use_case = UseCase::from(UserLevelDiskCache::MavenLocalRepository);
 
     let Ok(true) = maven_local.try_exists() else {
         return Ok(AllocatedResource::new(use_case, ByteUnit::from(0)));
@@ -67,7 +67,7 @@ pub fn usage_for_gradle_home(gradle_home: &Path) -> anyhow::Result<Vec<Allocated
         .filter_map(|entry| entry.ok())
         .filter(ensure_file)
         .map(|entry| (size_for_entry(&entry), evaluate_use_case_from_gradle_home(&entry)))
-        .filter(|item| item.1 != UseCase::from(DiskCached::GradleOtherFiles))
+        .filter(|item| item.1 != UseCase::from(UserLevelDiskCache::GradleOtherCaches))
         .group_by(|item| item.1)
         .into_iter()
         .map(|(use_case, group)| (use_case, group.fold(0, |total, (entry_size, _)| total + entry_size)))
@@ -110,15 +110,15 @@ fn evaluate_use_case_from_gradle_home(entry: &DirEntry) -> UseCase {
     // https://docs.gradle.org/current/userguide/configuration_cache.html
     // https://docs.gradle.org/current/userguide/directory_layout.html
     let cache_type = match raw_path {
-        _ if raw_path.contains(".gradle/caches") => DiskCached::GradleBuildCaching,
-        _ if raw_path.contains(".gradle/configuration-cache") => DiskCached::GradleConfigurationCaching,
-        _ if raw_path.contains(".gradle/daemon") => DiskCached::GradleDaemonLogs,
-        _ if raw_path.contains(".gradle/jdks") => DiskCached::GradleJDKToolchains,
-        _ if raw_path.contains(".gradle/wrapper") => DiskCached::GradleDistributions,
-        _ if raw_path.contains(".gradle/.tmp") => DiskCached::GradleTemporaryFiles,
-        _ if raw_path.contains(".gradle/native") => DiskCached::GradleNativeFiles,
-        _ if raw_path.contains(".gradle/build-scan-data") => DiskCached::GradleBuildScans,
-        _ => DiskCached::GradleOtherFiles,
+        _ if raw_path.contains(".gradle/caches") => UserLevelDiskCache::GradleBuildCaching,
+        _ if raw_path.contains(".gradle/configuration-cache") => UserLevelDiskCache::GradleConfigurationCaching,
+        _ if raw_path.contains(".gradle/daemon") => UserLevelDiskCache::GradleDaemonLogs,
+        _ if raw_path.contains(".gradle/jdks") => UserLevelDiskCache::GradleJDKToolchains,
+        _ if raw_path.contains(".gradle/wrapper") => UserLevelDiskCache::GradleDistributions,
+        _ if raw_path.contains(".gradle/.tmp") => UserLevelDiskCache::GradleTemporaryFiles,
+        _ if raw_path.contains(".gradle/native") => UserLevelDiskCache::GradleNativeFiles,
+        _ if raw_path.contains(".gradle/build-scan-data") => UserLevelDiskCache::GradleBuildScans,
+        _ => UserLevelDiskCache::GradleOtherCaches,
     };
 
     UseCase::from(cache_type)
@@ -127,7 +127,7 @@ fn evaluate_use_case_from_gradle_home(entry: &DirEntry) -> UseCase {
 #[cfg(test)]
 mod tests {
     use crate::disk::{usage_for_gradle_home, usage_for_gradle_projects, usage_for_maven_local};
-    use crate::models::{AllocatedResource, DiskCached, UseCase};
+    use crate::models::{AllocatedResource, ProjectLevelDiskCache, UseCase, UserLevelDiskCache};
     use fake::{Fake, StringFaker};
     use std::fs;
     use std::fs::File;
@@ -158,6 +158,8 @@ mod tests {
             "AndroidStudioProjects",
             "AndroidStudioProjects/my-project",
             "AndroidStudioProjects/my-project/build",
+            "AndroidStudioProjects/my-project/.idea",
+            "AndroidStudioProjects/my-project/.gradle",
         ];
 
         for folder in folders {
@@ -191,7 +193,7 @@ mod tests {
     }
 
     #[test]
-    fn should_compute_no_resources_when_missing_gradle_home() {
+    fn should_compute_no_shared_caches_when_missing_gradle_home() {
         let temp_dir = TempDir::new().expect("Cant create temp dir");
         let fake_gradle_home_path = temp_dir.path();
 
@@ -201,7 +203,7 @@ mod tests {
     }
 
     #[test]
-    fn should_compute_resources_when_gradle_home_has_different_caches() {
+    fn should_compute_shared_caches_when_gradle_home_has_content() {
         let temp_dir = TempDir::new().expect("Cant create temp dir");
 
         prepare_fake_gradle_home(&temp_dir);
@@ -220,28 +222,31 @@ mod tests {
         let usages = usage_for_gradle_home(fake_gradle_home_path).expect("Cannot compute use cases");
 
         let expected = vec![
-            AllocatedResource::new(UseCase::from(DiskCached::GradleConfigurationCaching), 1.kilobytes()),
-            AllocatedResource::new(UseCase::from(DiskCached::GradleBuildCaching), 3.kilobytes()),
-            AllocatedResource::new(UseCase::from(DiskCached::GradleDaemonLogs), 2.kilobytes()),
+            AllocatedResource::new(
+                UseCase::from(UserLevelDiskCache::GradleConfigurationCaching),
+                1.kilobytes(),
+            ),
+            AllocatedResource::new(UseCase::from(UserLevelDiskCache::GradleBuildCaching), 3.kilobytes()),
+            AllocatedResource::new(UseCase::from(UserLevelDiskCache::GradleDaemonLogs), 2.kilobytes()),
         ];
 
         assert_eq!(usages, expected);
     }
 
     #[test]
-    fn should_compute_no_resources_when_missing_maven_local() {
+    fn should_compute_shared_caches_when_missing_maven_local() {
         let temp_dir = TempDir::new().expect("Cant create temp dir");
         let fake_maven_local_path = temp_dir.path();
 
         let usage = usage_for_maven_local(fake_maven_local_path).expect("Cannot compute use cases");
 
-        let use_case = UseCase::from(DiskCached::MavenLocalStorage);
+        let use_case = UseCase::from(UserLevelDiskCache::MavenLocalRepository);
         let expected = AllocatedResource::new(use_case, ByteUnit::from(0));
         assert_eq!(usage, expected)
     }
 
     #[test]
-    fn should_compute_resources_when_maven_local_present() {
+    fn should_compute_shared_caches_when_maven_local_present() {
         let temp_dir = TempDir::new().expect("Cant create temp dir");
         let fake_maven_local_path = temp_dir.path();
 
@@ -253,25 +258,25 @@ mod tests {
 
         let usage = usage_for_maven_local(fake_maven_local_path).expect("Cannot compute use cases");
 
-        let use_case = UseCase::from(DiskCached::MavenLocalStorage);
+        let use_case = UseCase::from(UserLevelDiskCache::MavenLocalRepository);
         let expected = AllocatedResource::new(use_case, 2.kilobytes());
         assert_eq!(usage, expected)
     }
 
     #[test]
-    fn should_compute_no_resources_when_missing_gradle_projects() {
+    fn should_not_compute_build_output_files_when_missing_gradle_projects() {
         let temp_dir = TempDir::new().expect("Cant create temp dir");
         let fake_android_studio_projects_path = vec![temp_dir.path().to_path_buf()];
 
         let usage = usage_for_gradle_projects(&fake_android_studio_projects_path).expect("Cannot compute use cases");
 
-        let use_case = UseCase::from(DiskCached::BuildOutputForGradleProject);
+        let use_case = UseCase::from(ProjectLevelDiskCache::BuildOutput);
         let expected = AllocatedResource::new(use_case, ByteUnit::from(0));
         assert_eq!(usage, expected)
     }
 
     #[test]
-    fn should_compute_resources_when_gradle_projects_present() {
+    fn should_compute_build_output_files_when_gradle_projects_present() {
         let temp_dir = TempDir::new().expect("Cant create temp dir");
 
         prepare_fake_gradle_projects(&temp_dir);
@@ -284,7 +289,7 @@ mod tests {
 
         let usage = usage_for_gradle_projects(&fake_android_studio_projects_path).expect("Cannot compute use cases");
 
-        let use_case = UseCase::from(DiskCached::BuildOutputForGradleProject);
+        let use_case = UseCase::from(ProjectLevelDiskCache::BuildOutput);
         let expected = AllocatedResource::new(use_case, 5.kilobytes());
         assert_eq!(usage, expected)
     }
