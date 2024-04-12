@@ -1,7 +1,7 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
-use crate::models::{EvaluationOutcome, ExecutionOutcome, MachineResource, WipeAction, WippingOutcome};
+use crate::models::{EvaluationOutcome, ExecutionOutcome, MachineResource, WipeAction, WipingOutcome};
 use clap::{Args, Parser, Subcommand, ValueEnum};
 use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
@@ -97,24 +97,16 @@ impl Cli {
         println!();
     }
 
-    fn report_cleanup(&self, outcome: &WippingOutcome) {
-        let resource_name = match outcome.subject {
-            MachineResource::RamMemory => "system processes",
-            MachineResource::DiskSpace => "files",
-        };
-
+    fn report_cleanup(&self, outcome: &WipingOutcome) {
         println!();
-        println!(
-            "Reclaimed {} by deleting {} {}",
-            outcome.reclaimed_memory, outcome.freed_entries, resource_name
-        );
+        println!("Reclaimed {}", outcome.reclaimed);
         println!();
     }
 
     pub fn show_execution_outcome(&self, resource: &MachineResource, outcome: &ExecutionOutcome) -> anyhow::Result<()> {
         match outcome {
             ExecutionOutcome::Evaluation(evaluation) => self.report_resources(resource, evaluation),
-            ExecutionOutcome::Wipping(wipping) => self.report_cleanup(wipping),
+            ExecutionOutcome::Wiping(wipping) => self.report_cleanup(wipping),
         }
 
         Ok(())
