@@ -10,6 +10,9 @@ license = "MIT"
 publish = true
 categories = ["command-line-utilities"]
 
+[package.metadata]
+msrv = "1.74.0"
+
 [dependencies]
 anyhow = "1.0.81"
 clap = { version = "4.5.4", features = ["derive"] }
