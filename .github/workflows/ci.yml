@@ -51,6 +51,9 @@ jobs:
       - name: Check supply-chain issues
         run: just supply-chain-checks
 
+      - name: Check MSRV
+        run: just msrv-check
+
       - name: Build against supported targets
         run: just cross-build-pull-request
 
