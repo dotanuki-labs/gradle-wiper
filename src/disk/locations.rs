@@ -4,26 +4,39 @@
 use crate::models::DiskCached;
 use anyhow::anyhow;
 use directories::BaseDirs;
-use std::fs;
 use std::path::{Path, PathBuf};
 use walkdir::{DirEntry, WalkDir};
 
-pub fn perform_cleanup(resources: &[DiskCached]) {
-    let paths_to_remove = resources.iter().flat_map(find_paths).collect::<Vec<_>>();
-
-    let errors = paths_to_remove
-        .iter()
-        .map(fs::remove_dir_all)
-        .filter(|deletion| deletion.is_err())
-        .map(|deletion| deletion.expect_err("Expecting an error").to_string())
-        .collect::<Vec<String>>();
-
-    for error in errors {
-        eprintln!("{}", error);
-    }
+pub fn find_gradle_home() -> anyhow::Result<PathBuf> {
+    let base_dir = BaseDirs::new().ok_or(anyhow!("Cannot access base directories"))?;
+    let home_dir = base_dir.home_dir();
+    Ok(home_dir.join(".gradle"))
 }
 
-fn find_paths(cached: &DiskCached) -> Vec<PathBuf> {
+pub fn find_maven_local_repository() -> anyhow::Result<PathBuf> {
+    let base_dir = BaseDirs::new().ok_or(anyhow!("Cannot access base directories"))?;
+    let home_dir = base_dir.home_dir();
+    Ok(home_dir.join(".m2"))
+}
+
+pub fn find_all_gradle_projects() -> anyhow::Result<Vec<PathBuf>> {
+    let base_dir = BaseDirs::new().ok_or(anyhow!("Cannot access base directories"))?;
+    let home_dir = base_dir.home_dir();
+
+    let android_studio_projects_folder = home_dir.join("AndroidStudioProjects");
+    let android_projects = find_gradle_projects(android_studio_projects_folder.as_path())?;
+
+    let intellij_projects_folder = home_dir.join("IdeaProjects");
+    let jvm_projects = find_gradle_projects(intellij_projects_folder.as_path())?;
+
+    let mut all_projects: Vec<PathBuf> = Vec::new();
+    all_projects.extend(android_projects);
+    all_projects.extend(jvm_projects);
+
+    Ok(all_projects)
+}
+
+pub(crate) fn find_paths(cached: &DiskCached) -> Vec<PathBuf> {
     let base_dir = BaseDirs::new().expect("Cannot access base directories");
     let home_dir = base_dir.home_dir();
 
@@ -55,35 +68,6 @@ fn find_paths(cached: &DiskCached) -> Vec<PathBuf> {
             Some(path) => vec![home_dir.join(path)],
         },
     }
-}
-
-pub fn find_gradle_home() -> anyhow::Result<PathBuf> {
-    let base_dir = BaseDirs::new().ok_or(anyhow!("Cannot access base directories"))?;
-    let home_dir = base_dir.home_dir();
-    Ok(home_dir.join(".gradle"))
-}
-
-pub fn find_maven_local_repository() -> anyhow::Result<PathBuf> {
-    let base_dir = BaseDirs::new().ok_or(anyhow!("Cannot access base directories"))?;
-    let home_dir = base_dir.home_dir();
-    Ok(home_dir.join(".m2"))
-}
-
-pub fn find_all_gradle_projects() -> anyhow::Result<Vec<PathBuf>> {
-    let base_dir = BaseDirs::new().ok_or(anyhow!("Cannot access base directories"))?;
-    let home_dir = base_dir.home_dir();
-
-    let android_studio_projects_folder = home_dir.join("AndroidStudioProjects");
-    let android_projects = find_gradle_projects(android_studio_projects_folder.as_path())?;
-
-    let intellij_projects_folder = home_dir.join("IdeaProjects");
-    let jvm_projects = find_gradle_projects(intellij_projects_folder.as_path())?;
-
-    let mut all_projects: Vec<PathBuf> = Vec::new();
-    all_projects.extend(android_projects);
-    all_projects.extend(jvm_projects);
-
-    Ok(all_projects)
 }
 
 fn find_gradle_projects(folder: &Path) -> anyhow::Result<Vec<PathBuf>> {

@@ -1,9 +1,7 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
-use crate::disk::{usage_for_gradle_home, usage_for_gradle_projects, usage_for_maven_local};
-use crate::filesystem;
-use crate::filesystem::{find_all_gradle_projects, find_gradle_home, find_maven_local_repository};
+use crate::disk;
 use crate::models::{
     AllocatedResource, DiskCached, EvaluationOutcome, ExecutionOutcome, MachineResource, UserLevelDiskCache,
     WipeAction, WipingOutcome,
@@ -39,16 +37,16 @@ fn deep_wipe_ram() -> anyhow::Result<ExecutionOutcome> {
 }
 
 fn evaluate_disk_space() -> anyhow::Result<ExecutionOutcome> {
-    let gradle_home = find_gradle_home()?;
-    let gradle_home_resources = usage_for_gradle_home(gradle_home.as_path())?;
+    let gradle_home = disk::find_gradle_home()?;
+    let gradle_home_resources = disk::resources_used_by_gradle_home(gradle_home.as_path())?;
     let total_size_for_gradle_home = calculate_total_allocated(&gradle_home_resources);
 
-    let maven_local_repository = find_maven_local_repository()?;
-    let maven_local_resources = usage_for_maven_local(maven_local_repository.as_path())?;
+    let maven_local_repository = disk::find_maven_local_repository()?;
+    let maven_local_resources = disk::resources_used_by_maven_local_repository(maven_local_repository.as_path())?;
     let total_size_for_maven_local = maven_local_resources.amount;
 
-    let gradle_projects = find_all_gradle_projects()?;
-    let gradle_projects_resources = usage_for_gradle_projects(&gradle_projects)?;
+    let gradle_projects = disk::find_all_gradle_projects()?;
+    let gradle_projects_resources = disk::resources_used_by_gradle_projects(&gradle_projects)?;
     let total_size_for_gradle_projects = gradle_projects_resources.amount;
 
     let mut disk_resources: Vec<AllocatedResource> = Vec::new();
@@ -75,7 +73,7 @@ fn shallow_wipe_disk() -> anyhow::Result<ExecutionOutcome> {
         DiskCached::Shared(UserLevelDiskCache::MavenLocalRepository),
     ];
 
-    filesystem::perform_cleanup(&caches_to_remove);
+    disk::cleanup(&caches_to_remove);
 
     let after_cleaning = match evaluate_disk_space()? {
         ExecutionOutcome::Evaluation(outcome) => outcome.total_size,
