@@ -3,7 +3,6 @@
 
 mod cli;
 mod disk;
-mod filesystem;
 mod models;
 mod wiper;
 
