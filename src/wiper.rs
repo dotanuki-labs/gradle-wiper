@@ -6,6 +6,7 @@ use crate::models::{
     AllocatedResource, DiskCached, EvaluationOutcome, ExecutionOutcome, MachineResource, UserLevelDiskCache,
     WipeAction, WipingOutcome,
 };
+use std::path::PathBuf;
 use ubyte::{ByteUnit, ToByteUnit};
 use MachineResource::{DiskSpace, RamMemory};
 use WipeAction::{DeepWipe, Evaluate, ShallowWipe};
@@ -73,7 +74,12 @@ fn shallow_wipe_disk() -> anyhow::Result<ExecutionOutcome> {
         DiskCached::Shared(UserLevelDiskCache::MavenLocalRepository),
     ];
 
-    disk::cleanup(&caches_to_remove);
+    let paths_to_remove = caches_to_remove
+        .into_iter()
+        .flat_map(disk::find_associated_filepaths)
+        .collect::<Vec<PathBuf>>();
+
+    disk::cleanup_resources(&paths_to_remove);
 
     let after_cleaning = match evaluate_disk_space()? {
         ExecutionOutcome::Evaluation(outcome) => outcome.total_size,
