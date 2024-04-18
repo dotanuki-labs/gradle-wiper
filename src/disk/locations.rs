@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 use crate::models::DiskCached;
-use anyhow::anyhow;
 use directories::BaseDirs;
 use std::path::{Path, PathBuf};
 use walkdir::{DirEntry, WalkDir};
@@ -14,20 +13,20 @@ pub fn find_gradle_home() -> anyhow::Result<PathBuf> {
         return Ok(PathBuf::from(custom_gradle_home));
     }
 
-    let base_dir = BaseDirs::new().ok_or(anyhow!("Cannot access base directories"))?;
-    let home_dir = base_dir.home_dir();
+    let base_dirs = BaseDirs::new().expect("Cannot access base directories");
+    let home_dir = base_dirs.home_dir();
     Ok(home_dir.join(".gradle"))
 }
 
 pub fn find_maven_local_repository() -> anyhow::Result<PathBuf> {
-    let base_dir = BaseDirs::new().ok_or(anyhow!("Cannot access base directories"))?;
-    let home_dir = base_dir.home_dir();
+    let base_dirs = BaseDirs::new().expect("Cannot access base directories");
+    let home_dir = base_dirs.home_dir();
     Ok(home_dir.join(".m2"))
 }
 
 pub fn find_all_gradle_projects() -> anyhow::Result<Vec<PathBuf>> {
-    let base_dir = BaseDirs::new().ok_or(anyhow!("Cannot access base directories"))?;
-    let home_dir = base_dir.home_dir();
+    let base_dirs = BaseDirs::new().expect("Cannot access base directories");
+    let home_dir = base_dirs.home_dir();
 
     let android_studio_projects_folder = home_dir.join("AndroidStudioProjects");
     let android_projects = find_gradle_projects(android_studio_projects_folder.as_path())?;
@@ -42,10 +41,7 @@ pub fn find_all_gradle_projects() -> anyhow::Result<Vec<PathBuf>> {
     Ok(all_projects)
 }
 
-pub(crate) fn find_paths(cached: &DiskCached) -> Vec<PathBuf> {
-    let base_dir = BaseDirs::new().expect("Cannot access base directories");
-    let home_dir = base_dir.home_dir();
-
+pub fn find_associated_filepaths(cached: DiskCached) -> Vec<PathBuf> {
     match cached {
         DiskCached::Standalone(_project_level) => {
             let gradle_projects = find_all_gradle_projects().unwrap_or_default();
@@ -71,7 +67,17 @@ pub(crate) fn find_paths(cached: &DiskCached) -> Vec<PathBuf> {
         },
         DiskCached::Shared(user_level) => match user_level.path_relative_to_user_home() {
             None => vec![],
-            Some(path) => vec![home_dir.join(path)],
+            Some(path) => {
+                if let Ok(custom_gradle_home) = std::env::var("GRADLE_USER_HOME") {
+                    if path.to_string_lossy().contains(".gradle") {
+                        return vec![PathBuf::from(custom_gradle_home).join(path)];
+                    }
+                }
+
+                let base_dirs = BaseDirs::new().expect("Cannot access base directories");
+                let home_dir = base_dirs.home_dir();
+                vec![home_dir.join(path)]
+            },
         },
     }
 }

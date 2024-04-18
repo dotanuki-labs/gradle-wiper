@@ -1,15 +1,10 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
-use crate::models::DiskCached;
 use std::fs;
+use std::path::PathBuf;
 
-pub fn cleanup(resources: &[DiskCached]) {
-    let paths_to_remove = resources
-        .iter()
-        .flat_map(crate::disk::locations::find_paths)
-        .collect::<Vec<_>>();
-
+pub fn cleanup_resources(paths_to_remove: &[PathBuf]) {
     let errors = paths_to_remove
         .iter()
         .map(fs::remove_dir_all)
