@@ -8,6 +8,12 @@ use std::path::{Path, PathBuf};
 use walkdir::{DirEntry, WalkDir};
 
 pub fn find_gradle_home() -> anyhow::Result<PathBuf> {
+    // https://docs.gradle.org/current/userguide/directory_layout.html#dir:gradle_user_home
+    // Useful also for tests
+    if let Ok(custom_gradle_home) = std::env::var("GRADLE_USER_HOME") {
+        return Ok(PathBuf::from(custom_gradle_home));
+    }
+
     let base_dir = BaseDirs::new().ok_or(anyhow!("Cannot access base directories"))?;
     let home_dir = base_dir.home_dir();
     Ok(home_dir.join(".gradle"))
