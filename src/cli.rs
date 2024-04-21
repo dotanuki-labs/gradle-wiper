@@ -66,12 +66,12 @@ impl Cli {
 
         let allocated = &outcome.resources;
 
-        if allocated.is_empty() {
-            let what = match resource {
-                MachineResource::RamMemory => "RAM memory",
-                MachineResource::DiskSpace => "disk space",
-            };
+        let what = match resource {
+            MachineResource::RamMemory => "RAM memory",
+            MachineResource::DiskSpace => "disk space",
+        };
 
+        if allocated.is_empty() {
             println!("No usages of {} related to Gradle builds were found", what);
             println!();
             return;
@@ -91,22 +91,28 @@ impl Cli {
             .set_header(vec!["What", "Total Size"])
             .add_rows(rows);
 
-        table.add_row(vec!["Total", &outcome.total_size.to_string()]);
-
         println!("{table}");
+
+        println!();
+        println!("Total resources ({what}) : {:.1}", &outcome.total_size.to_string());
         println!();
     }
 
-    fn report_cleanup(&self, outcome: &WipingOutcome) {
+    fn report_cleanup(&self, resource: &MachineResource, outcome: &WipingOutcome) {
+        let what = match resource {
+            MachineResource::RamMemory => "RAM memory",
+            MachineResource::DiskSpace => "disk space",
+        };
+
         println!();
-        println!("Reclaimed {}", outcome.reclaimed);
+        println!("Reclaimed {what} : {:.1}", outcome.reclaimed);
         println!();
     }
 
     pub fn show_execution_outcome(&self, resource: &MachineResource, outcome: &ExecutionOutcome) -> anyhow::Result<()> {
         match outcome {
             ExecutionOutcome::Evaluation(evaluation) => self.report_resources(resource, evaluation),
-            ExecutionOutcome::Wiping(wipping) => self.report_cleanup(wipping),
+            ExecutionOutcome::Wiping(wipping) => self.report_cleanup(resource, wipping),
         }
 
         Ok(())

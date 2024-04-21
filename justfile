@@ -100,3 +100,14 @@ msrv-check:
     @echo "→ Checking minimum supported Rust version (MSRV)"
     cargo msrv verify
     @echo
+
+# Running E2E tests
+e2e:
+    @echo "→ Build release target"
+    cargo build --release
+    @echo
+
+    @echo "→ Running E2E tests"
+    docker build . -t dotanuki-labs/gradle-wiper-tests -f e2e/Dockerfile
+    docker run dotanuki-labs/gradle-wiper-tests
+    @echo
