@@ -21,17 +21,7 @@ pub fn find_maven_local_repository() -> anyhow::Result<PathBuf> {
 pub fn find_all_gradle_projects() -> anyhow::Result<Vec<PathBuf>> {
     let base_dirs = BaseDirs::new().expect("Cannot access base directories");
     let home_dir = base_dirs.home_dir();
-
-    let android_studio_projects_folder = home_dir.join("AndroidStudioProjects");
-    let android_projects = find_gradle_projects(android_studio_projects_folder.as_path())?;
-
-    let intellij_projects_folder = home_dir.join("IdeaProjects");
-    let jvm_projects = find_gradle_projects(intellij_projects_folder.as_path())?;
-
-    let mut all_projects: Vec<PathBuf> = Vec::new();
-    all_projects.extend(android_projects);
-    all_projects.extend(jvm_projects);
-
+    let all_projects = find_gradle_projects(home_dir)?;
     Ok(all_projects)
 }
 
