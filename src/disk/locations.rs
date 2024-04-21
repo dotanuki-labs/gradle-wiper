@@ -7,12 +7,6 @@ use std::path::{Path, PathBuf};
 use walkdir::{DirEntry, WalkDir};
 
 pub fn find_gradle_home() -> anyhow::Result<PathBuf> {
-    // https://docs.gradle.org/current/userguide/directory_layout.html#dir:gradle_user_home
-    // Useful also for tests
-    if let Ok(custom_gradle_home) = std::env::var("GRADLE_USER_HOME") {
-        return Ok(PathBuf::from(custom_gradle_home));
-    }
-
     let base_dirs = BaseDirs::new().expect("Cannot access base directories");
     let home_dir = base_dirs.home_dir();
     Ok(home_dir.join(".gradle"))
@@ -68,12 +62,6 @@ pub fn find_associated_filepaths(cached: DiskCached) -> Vec<PathBuf> {
         DiskCached::Shared(user_level) => match user_level.path_relative_to_user_home() {
             None => vec![],
             Some(path) => {
-                if let Ok(custom_gradle_home) = std::env::var("GRADLE_USER_HOME") {
-                    if path.to_string_lossy().contains(".gradle") {
-                        return vec![PathBuf::from(custom_gradle_home).join(path)];
-                    }
-                }
-
                 let base_dirs = BaseDirs::new().expect("Cannot access base directories");
                 let home_dir = base_dirs.home_dir();
                 vec![home_dir.join(path)]
