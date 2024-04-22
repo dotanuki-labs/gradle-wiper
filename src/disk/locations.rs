@@ -1,7 +1,7 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
-use crate::models::DiskCached;
+use crate::models::{DiskCached, ProjectLevelDiskCache};
 use directories::BaseDirs;
 use std::path::{Path, PathBuf};
 use walkdir::{DirEntry, WalkDir};
@@ -27,27 +27,20 @@ pub fn find_all_gradle_projects() -> anyhow::Result<Vec<PathBuf>> {
 
 pub fn find_associated_filepaths(cached: DiskCached) -> Vec<PathBuf> {
     match cached {
-        DiskCached::Standalone(_project_level) => {
-            let gradle_projects = find_all_gradle_projects().unwrap_or_default();
+        DiskCached::Standalone(project_level) => {
+            let gradle_projects = find_all_gradle_projects().expect("Expecting Gradle projects");
 
             if gradle_projects.is_empty() {
                 return gradle_projects;
             };
 
-            let gradle_metadata = gradle_projects
-                .iter()
-                .map(|path| path.join(".gradle"))
-                .collect::<Vec<_>>();
+            let target = match project_level {
+                ProjectLevelDiskCache::BuildOutput => "build",
+                ProjectLevelDiskCache::GradleMetadata => ".gradle",
+                ProjectLevelDiskCache::IdeaMetadata => ".idea",
+            };
 
-            let idea_metadata = gradle_projects
-                .iter()
-                .map(|path| path.join(".idea"))
-                .collect::<Vec<_>>();
-
-            let mut results: Vec<PathBuf> = Vec::new();
-            results.extend(gradle_metadata);
-            results.extend(idea_metadata);
-            results
+            gradle_projects.iter().map(|path| path.join(target)).collect::<Vec<_>>()
         },
         DiskCached::Shared(user_level) => match user_level.path_relative_to_user_home() {
             None => vec![],

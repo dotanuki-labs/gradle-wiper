@@ -219,3 +219,12 @@ pub enum ExecutionOutcome {
     Evaluation(EvaluationOutcome),
     Wiping(WipingOutcome),
 }
+
+impl ExecutionOutcome {
+    pub fn as_evaluation(&self) -> &EvaluationOutcome {
+        match self {
+            ExecutionOutcome::Evaluation(evaluation) => evaluation,
+            ExecutionOutcome::Wiping(_) => panic!("Not an evaluation"),
+        }
+    }
+}

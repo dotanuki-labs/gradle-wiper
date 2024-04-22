@@ -3,8 +3,8 @@
 
 use crate::disk;
 use crate::models::{
-    AllocatedResource, DiskCached, EvaluationOutcome, ExecutionOutcome, MachineResource, UserLevelDiskCache,
-    WipeAction, WipingOutcome,
+    AllocatedResource, DiskCached, EvaluationOutcome, ExecutionOutcome, MachineResource, ProjectLevelDiskCache,
+    UserLevelDiskCache, WipeAction, WipingOutcome,
 };
 use std::path::PathBuf;
 use ubyte::{ByteUnit, ToByteUnit};
@@ -61,18 +61,40 @@ fn evaluate_disk_space() -> anyhow::Result<ExecutionOutcome> {
 }
 
 fn shallow_wipe_disk() -> anyhow::Result<ExecutionOutcome> {
-    let before_cleaning = match evaluate_disk_space()? {
-        ExecutionOutcome::Evaluation(outcome) => outcome.total_size,
-        ExecutionOutcome::Wiping(_) => panic!("Expecting an evaluation, not a wipping"),
-    };
-
     let caches_to_remove = vec![
         DiskCached::Shared(UserLevelDiskCache::GradleBuildCaching),
         DiskCached::Shared(UserLevelDiskCache::GradleConfigurationCaching),
         DiskCached::Shared(UserLevelDiskCache::GradleDaemonLogs),
         DiskCached::Shared(UserLevelDiskCache::GradleTemporaryFiles),
         DiskCached::Shared(UserLevelDiskCache::MavenLocalRepository),
+        DiskCached::Standalone(ProjectLevelDiskCache::BuildOutput),
     ];
+
+    wipe_disk(caches_to_remove)
+}
+
+fn deep_wipe_ram_disk() -> anyhow::Result<ExecutionOutcome> {
+    let caches_to_remove = vec![
+        DiskCached::Shared(UserLevelDiskCache::GradleBuildCaching),
+        DiskCached::Shared(UserLevelDiskCache::GradleConfigurationCaching),
+        DiskCached::Shared(UserLevelDiskCache::GradleDaemonLogs),
+        DiskCached::Shared(UserLevelDiskCache::GradleTemporaryFiles),
+        DiskCached::Shared(UserLevelDiskCache::MavenLocalRepository),
+        DiskCached::Shared(UserLevelDiskCache::GradleJDKToolchains),
+        DiskCached::Shared(UserLevelDiskCache::GradleNativeFiles),
+        DiskCached::Shared(UserLevelDiskCache::GradleBuildScans),
+        DiskCached::Shared(UserLevelDiskCache::GradleDistributions),
+        DiskCached::Standalone(ProjectLevelDiskCache::BuildOutput),
+        DiskCached::Standalone(ProjectLevelDiskCache::GradleMetadata),
+        DiskCached::Standalone(ProjectLevelDiskCache::IdeaMetadata),
+    ];
+
+    wipe_disk(caches_to_remove)
+}
+
+fn wipe_disk(caches_to_remove: Vec<DiskCached>) -> anyhow::Result<ExecutionOutcome> {
+    let before_cleaning = evaluate_disk_space()?;
+    let before_cleaning_evaluation = before_cleaning.as_evaluation();
 
     let paths_to_remove = caches_to_remove
         .into_iter()
@@ -81,17 +103,12 @@ fn shallow_wipe_disk() -> anyhow::Result<ExecutionOutcome> {
 
     disk::cleanup_resources(&paths_to_remove);
 
-    let after_cleaning = match evaluate_disk_space()? {
-        ExecutionOutcome::Evaluation(outcome) => outcome.total_size,
-        ExecutionOutcome::Wiping(_) => panic!("Expecting an evaluation, not a wipping"),
-    };
+    let after_cleaning = evaluate_disk_space()?;
+    let after_cleaning_evaluation = after_cleaning.as_evaluation();
+    let reclaimed = before_cleaning_evaluation.total_size - after_cleaning_evaluation.total_size;
+    let outcome = WipingOutcome::new(DiskSpace, reclaimed);
 
-    let outcome = WipingOutcome::new(DiskSpace, before_cleaning - after_cleaning);
     Ok(ExecutionOutcome::Wiping(outcome))
-}
-
-fn deep_wipe_ram_disk() -> anyhow::Result<ExecutionOutcome> {
-    todo!()
 }
 
 fn calculate_total_allocated(resources: &[AllocatedResource]) -> ByteUnit {
