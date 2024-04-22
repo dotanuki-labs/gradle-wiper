@@ -45,17 +45,20 @@ jobs:
       - name: Check code smells
         run: just lint
 
-      - name: Run tests
-        run: just tests
-
       - name: Check supply-chain issues
         run: just supply-chain-checks
 
       - name: Check MSRV
         run: just msrv-check
 
-      - name: Build against supported targets
+      - name: Cross-compilation against some targets
         run: just cross-build-pull-request
+
+      - name: Run unit tests
+        run: just tests
+
+      - name: Run E2E tests
+        run: just e2e
 
       - name: Archive SBOM
         uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
