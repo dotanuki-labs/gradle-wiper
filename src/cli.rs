@@ -94,7 +94,7 @@ impl Cli {
         println!("{table}");
 
         println!();
-        println!("Total resources ({what}) : {:.1}", &outcome.total_size.to_string());
+        println!("Total resources ({what}) : {:.1}", &outcome.total_size);
         println!();
     }
 
