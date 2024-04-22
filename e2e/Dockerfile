@@ -1,4 +1,4 @@
-FROM azul/zulu-openjdk:latest
+FROM azul/zulu-openjdk:21-latest
 
 RUN apt-get update && apt-get install -y git openssh-client bats
 RUN cd $HOME && mkdir -p $HOME/.ssh

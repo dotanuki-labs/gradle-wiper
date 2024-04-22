@@ -66,13 +66,8 @@ impl Cli {
 
         let allocated = &outcome.resources;
 
-        let what = match resource {
-            MachineResource::RamMemory => "RAM memory",
-            MachineResource::DiskSpace => "disk space",
-        };
-
         if allocated.is_empty() {
-            println!("No usages of {} related to Gradle builds were found", what);
+            println!("No usages of {} related to Gradle builds were found", resource);
             println!();
             return;
         }
@@ -94,18 +89,13 @@ impl Cli {
         println!("{table}");
 
         println!();
-        println!("Total resources ({what}) : {:.1}", &outcome.total_size);
+        println!("Total resources ({}) : {:.1}", resource, &outcome.total_size);
         println!();
     }
 
     fn report_cleanup(&self, resource: &MachineResource, outcome: &WipingOutcome) {
-        let what = match resource {
-            MachineResource::RamMemory => "RAM memory",
-            MachineResource::DiskSpace => "disk space",
-        };
-
         println!();
-        println!("Reclaimed {what} : {:.1}", outcome.reclaimed);
+        println!("Reclaimed {} : {:.1}", resource, outcome.reclaimed);
         println!();
     }
 

@@ -11,6 +11,17 @@ pub enum MachineResource {
     DiskSpace,
 }
 
+impl Display for MachineResource {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+        let formatted = match self {
+            MachineResource::RamMemory => "RAM memory",
+            MachineResource::DiskSpace => "disk space",
+        };
+
+        formatter.write_str(formatted)
+    }
+}
+
 #[derive(Debug)]
 pub enum WipeAction {
     Evaluate,
