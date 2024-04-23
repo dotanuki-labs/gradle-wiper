@@ -23,6 +23,7 @@ itertools = "0.12.1"
 walkdir = "2.5.0"
 uuid = { version = "1.7.0", features = ["v4"] }
 ubyte = "0.10.4"
+cached = "0.49.3"
 
 [dev-dependencies]
 fake = "2.9.2"
