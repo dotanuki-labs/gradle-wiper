@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 use crate::models::{DiskCached, ProjectLevelDiskCache};
+use cached::proc_macro::cached;
 use directories::BaseDirs;
 use std::path::{Path, PathBuf};
 use walkdir::{DirEntry, WalkDir};
@@ -18,6 +19,7 @@ pub fn find_maven_local_repository() -> anyhow::Result<PathBuf> {
     Ok(home_dir.join(".m2"))
 }
 
+#[cached(result = true)]
 pub fn find_all_gradle_projects() -> anyhow::Result<Vec<PathBuf>> {
     let base_dirs = BaseDirs::new().expect("Cannot access base directories");
     let home_dir = base_dirs.home_dir();
