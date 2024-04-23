@@ -4,6 +4,7 @@
 use crate::disk::user_home_locator;
 use crate::models::{DiskCached, ProjectLevelDiskCache};
 use cached::proc_macro::cached;
+use log::debug;
 use std::path::{Path, PathBuf};
 use walkdir::{DirEntry, WalkDir};
 
@@ -73,7 +74,14 @@ fn ensure_gradle_project(entry: &DirEntry) -> bool {
         has_top_level_gradle_properties,
     ];
 
-    verifications.into_iter().all(|check| check)
+    let found = verifications.into_iter().all(|check| check);
+
+    if found {
+        let raw_path = entry.path().to_str().expect("Not a valid path");
+        debug!("Found Gradle project -> {}", raw_path);
+    }
+
+    found
 }
 
 #[cfg(test)]

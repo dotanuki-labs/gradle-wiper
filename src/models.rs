@@ -29,6 +29,18 @@ pub enum WipeAction {
     DeepWipe,
 }
 
+impl Display for WipeAction {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
+        let formatted = match self {
+            WipeAction::Evaluate => "evaluation",
+            WipeAction::ShallowWipe => "shallow wiping",
+            WipeAction::DeepWipe => "deep wiping",
+        };
+
+        formatter.write_str(formatted)
+    }
+}
+
 #[allow(dead_code)]
 #[allow(clippy::enum_variant_names)]
 #[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, PartialOrd, Ord)]
