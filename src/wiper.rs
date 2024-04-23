@@ -38,15 +38,16 @@ fn deep_wipe_ram() -> anyhow::Result<ExecutionOutcome> {
 }
 
 fn evaluate_disk_space() -> anyhow::Result<ExecutionOutcome> {
-    let gradle_home = disk::find_gradle_home()?;
+    let user_home = disk::user_home_locator();
+    let gradle_home = disk::find_gradle_home(user_home.as_path());
     let gradle_home_resources = disk::resources_used_by_gradle_home(gradle_home.as_path())?;
     let total_size_for_gradle_home = calculate_total_allocated(&gradle_home_resources);
 
-    let maven_local_repository = disk::find_maven_local_repository()?;
+    let maven_local_repository = disk::find_maven_local_repository(user_home.as_path());
     let maven_local_resources = disk::resources_used_by_maven_local_repository(maven_local_repository.as_path())?;
     let total_size_for_maven_local = maven_local_resources.amount;
 
-    let gradle_projects = disk::find_all_gradle_projects()?;
+    let gradle_projects = disk::find_all_gradle_projects(user_home);
     let gradle_projects_resources = disk::resources_used_by_gradle_projects(&gradle_projects)?;
     let total_size_for_gradle_projects = gradle_projects_resources.amount;
 
@@ -98,7 +99,7 @@ fn wipe_disk(caches_to_remove: Vec<DiskCached>) -> anyhow::Result<ExecutionOutco
 
     let paths_to_remove = caches_to_remove
         .into_iter()
-        .flat_map(disk::find_associated_filepaths)
+        .flat_map(|item| disk::find_associated_filepaths(disk::user_home_locator(), item))
         .collect::<Vec<PathBuf>>();
 
     disk::cleanup_resources(&paths_to_remove);
