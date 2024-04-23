@@ -1,4 +1,6 @@
 #!/usr/bin/env bats
+# Copyright 2024 Dotanuki Labs
+# SPDX-License-Identifier: MIT
 
 current_dir="$(cd "$(dirname "$BATS_TEST_FILENAME")" >/dev/null 2>&1 && pwd)"
 
