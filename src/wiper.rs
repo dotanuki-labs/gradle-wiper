@@ -6,12 +6,17 @@ use crate::models::{
     AllocatedResource, DiskCached, EvaluationOutcome, ExecutionOutcome, MachineResource, ProjectLevelDiskCache,
     UserLevelDiskCache, WipeAction, WipingOutcome,
 };
+use log::debug;
 use std::path::PathBuf;
 use ubyte::{ByteUnit, ToByteUnit};
 use MachineResource::{DiskSpace, RamMemory};
 use WipeAction::{DeepWipe, Evaluate, ShallowWipe};
 
 pub fn execute(target: &MachineResource, action: WipeAction) -> anyhow::Result<ExecutionOutcome> {
+    debug!("");
+    debug!("Machine resource : {}", target);
+    debug!("Requested operation : {}", action);
+
     match (target, action) {
         (RamMemory, Evaluate) => evaluate_ram_memory(),
         (RamMemory, ShallowWipe) => shallow_wipe_ram(),
@@ -43,9 +48,22 @@ fn evaluate_disk_space() -> anyhow::Result<ExecutionOutcome> {
     let gradle_home_resources = disk::resources_used_by_gradle_home(gradle_home.as_path())?;
     let total_size_for_gradle_home = calculate_total_allocated(&gradle_home_resources);
 
+    if gradle_home.exists() {
+        debug!("Gradle home : {}", &gradle_home.to_string_lossy());
+        debug!("Storage taken by Gradle caches : {}", total_size_for_gradle_home);
+    }
+
     let maven_local_repository = disk::find_maven_local_repository(user_home.as_path());
     let maven_local_resources = disk::resources_used_by_maven_local_repository(maven_local_repository.as_path())?;
     let total_size_for_maven_local = maven_local_resources.amount;
+
+    if maven_local_repository.exists() {
+        debug!(
+            "Maven local repository path : {}",
+            &maven_local_repository.to_string_lossy()
+        );
+        debug!("Storage taken by Maven local : {}", total_size_for_maven_local);
+    }
 
     let gradle_projects = disk::find_all_gradle_projects(user_home);
     let gradle_projects_resources = disk::resources_used_by_gradle_projects(&gradle_projects)?;

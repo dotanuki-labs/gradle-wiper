@@ -24,6 +24,8 @@ walkdir = "2.5.0"
 uuid = { version = "1.7.0", features = ["v4"] }
 ubyte = "0.10.4"
 cached = "0.49.3"
+env_logger = { version = "0.11.3", features = ["color"]}
+log = "0.4.21"
 
 [dev-dependencies]
 fake = "2.9.2"

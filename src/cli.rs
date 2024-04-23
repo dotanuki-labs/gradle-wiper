@@ -19,10 +19,13 @@ enum ExecutionMode {
 struct WrappedArguments {
     #[arg(value_enum)]
     pub mode: ExecutionMode,
+
+    #[arg(short, long)]
+    pub verbose: bool,
 }
 
-impl From<WrappedArguments> for WipeAction {
-    fn from(value: WrappedArguments) -> Self {
+impl From<&WrappedArguments> for WipeAction {
+    fn from(value: &WrappedArguments) -> Self {
         match value.mode {
             ExecutionMode::Evaluate => WipeAction::Evaluate,
             ExecutionMode::Shallow => WipeAction::ShallowWipe,
@@ -53,11 +56,11 @@ impl Cli {
         Self {}
     }
 
-    pub fn parsed_arguments(&self) -> (MachineResource, WipeAction) {
+    pub fn parsed_arguments(&self) -> (MachineResource, WipeAction, bool) {
         let cli = CliParser::parse();
         match cli.command {
-            Commands::Disk(args) => (MachineResource::DiskSpace, WipeAction::from(args)),
-            Commands::Ram(args) => (MachineResource::RamMemory, WipeAction::from(args)),
+            Commands::Disk(args) => (MachineResource::DiskSpace, WipeAction::from(&args), args.verbose),
+            Commands::Ram(args) => (MachineResource::RamMemory, WipeAction::from(&args), args.verbose),
         }
     }
 
