@@ -2,6 +2,20 @@
 
 current_dir="$(cd "$(dirname "$BATS_TEST_FILENAME")" >/dev/null 2>&1 && pwd)"
 
+@test "should reject invalid arguments" {
+    run gradle-wiper disk full
+
+    [[ "$output" == *"possible values: evaluate, shallow, deep"* ]]
+    [ ! "$status" -eq 0 ]
+}
+
+@test "should show help" {
+    run gradle-wiper help
+
+    [[ "$output" == *"Reclaim machine resources (RAM, Disk) attached to Gradle builds"* ]]
+    [ "$status" -eq 0 ]
+}
+
 @test "should detect usages of disk" {
     run $HOME/aaw/gradlew tasks -q -p $HOME/aaw
     run gradle-wiper disk evaluate
