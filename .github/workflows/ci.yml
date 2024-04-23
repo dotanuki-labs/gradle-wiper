@@ -19,7 +19,7 @@ jobs:
       - name: Run essential checks
         uses: dotanuki-labs/github-actions/essentials@main
         with:
-          file-patterns: '*.sh,*.rs,*.yml'
+          file-patterns: '*.sh,*.rs,*.yml,*.bats,*Dockerfile'
           license: 'mit'
   build:
     runs-on: ubuntu-22.04
