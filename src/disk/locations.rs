@@ -16,6 +16,10 @@ pub fn find_maven_local_repository(user_home: &Path) -> PathBuf {
     user_home.to_path_buf().join(".m2")
 }
 
+pub fn find_konan_caches(user_home: &Path) -> PathBuf {
+    user_home.to_path_buf().join(".konan")
+}
+
 #[cached]
 pub fn find_all_gradle_projects(user_home: PathBuf) -> Vec<PathBuf> {
     WalkDir::new(user_home)

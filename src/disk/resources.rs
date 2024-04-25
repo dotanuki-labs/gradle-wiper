@@ -23,41 +23,23 @@ pub fn resources_used_by_gradle_projects(projects: &[PathBuf]) -> anyhow::Result
 
 fn resources_used_per_gradle_project(gradle_project: &Path) -> anyhow::Result<AllocatedResource> {
     let use_case = UseCase::from(ProjectLevelDiskCache::BuildOutput);
-
-    let Ok(true) = gradle_project.try_exists() else {
-        return Ok(AllocatedResource::new(use_case, ByteUnit::from(0)));
-    };
-
-    let total = WalkDir::new(gradle_project)
-        .into_iter()
-        .filter_map(|entry| entry.ok())
-        .filter(ensure_build_output_file)
-        .map(|entry| size_for_entry(&entry))
-        .sum::<u64>();
-
-    Ok(AllocatedResource::new(use_case, ByteUnit::from(total)))
+    let disk_dize = total_disk_size(gradle_project, ensure_build_output_file)?;
+    Ok(AllocatedResource::new(use_case, disk_dize))
 }
 
 pub fn resources_used_by_maven_local_repository(maven_local: &Path) -> anyhow::Result<AllocatedResource> {
-    // We trust that M2 local repository lives under $HOME/.m2
     let use_case = UseCase::from(UserLevelDiskCache::MavenLocalRepository);
+    let disk_size = total_disk_size(maven_local, ensure_file)?;
+    Ok(AllocatedResource::new(use_case, disk_size))
+}
 
-    let Ok(true) = maven_local.try_exists() else {
-        return Ok(AllocatedResource::new(use_case, ByteUnit::from(0)));
-    };
-
-    let total_amount = WalkDir::new(maven_local)
-        .into_iter()
-        .filter_map(|entry| entry.ok())
-        .filter(ensure_file)
-        .map(|entry| size_for_entry(&entry))
-        .sum::<u64>();
-
-    Ok(AllocatedResource::new(use_case, ByteUnit::from(total_amount)))
+pub fn resources_used_by_konan(konan_folder: &Path) -> anyhow::Result<AllocatedResource> {
+    let use_case = UseCase::from(UserLevelDiskCache::KonanCaches);
+    let disk_size = total_disk_size(konan_folder, ensure_file)?;
+    Ok(AllocatedResource::new(use_case, disk_size))
 }
 
 pub fn resources_used_by_gradle_home(gradle_home: &Path) -> anyhow::Result<Vec<AllocatedResource>> {
-    // We trust that gradle_home == $HOME/.gradle
     let Ok(true) = gradle_home.try_exists() else {
         return Ok(vec![]);
     };
@@ -76,6 +58,21 @@ pub fn resources_used_by_gradle_home(gradle_home: &Path) -> anyhow::Result<Vec<A
         .collect::<Vec<_>>();
 
     Ok(total_per_use_case)
+}
+
+fn total_disk_size(folder_path: &Path, filter: fn(&DirEntry) -> bool) -> anyhow::Result<ByteUnit> {
+    let Ok(true) = folder_path.try_exists() else {
+        return Ok(ByteUnit::from(0));
+    };
+
+    let disk_size = WalkDir::new(folder_path)
+        .into_iter()
+        .filter_map(|entry| entry.ok())
+        .filter(filter)
+        .map(|entry| size_for_entry(&entry))
+        .sum::<u64>();
+
+    Ok(ByteUnit::from(disk_size))
 }
 
 fn size_for_entry(entry: &DirEntry) -> u64 {
