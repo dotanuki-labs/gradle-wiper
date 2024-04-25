@@ -65,6 +65,15 @@ fn evaluate_disk_space() -> anyhow::Result<ExecutionOutcome> {
         debug!("Storage taken by Maven local : {}", total_size_for_maven_local);
     }
 
+    let konan_caches = disk::find_konan_caches(user_home.as_path());
+    let konan_resources = disk::resources_used_by_konan(konan_caches.as_path())?;
+    let total_size_for_konan_caches = konan_resources.amount;
+
+    if konan_caches.exists() {
+        debug!("Konan caches path : {}", &konan_caches.to_string_lossy());
+        debug!("Storage taken by Konan : {}", total_size_for_konan_caches);
+    }
+
     let gradle_projects = disk::find_all_gradle_projects(user_home);
     let gradle_projects_resources = disk::resources_used_by_gradle_projects(&gradle_projects)?;
     let total_size_for_gradle_projects = gradle_projects_resources.amount;
@@ -72,10 +81,15 @@ fn evaluate_disk_space() -> anyhow::Result<ExecutionOutcome> {
     let mut disk_resources: Vec<AllocatedResource> = Vec::new();
     disk_resources.extend(gradle_home_resources);
     disk_resources.push(maven_local_resources);
+    disk_resources.push(konan_resources);
     disk_resources.push(gradle_projects_resources);
 
-    let total_size_on_disk = total_size_for_gradle_home + total_size_for_maven_local + total_size_for_gradle_projects;
-    let outcome = EvaluationOutcome::new(disk_resources, total_size_on_disk);
+    let total_cached = total_size_for_konan_caches
+        + total_size_for_gradle_home
+        + total_size_for_maven_local
+        + total_size_for_gradle_projects;
+
+    let outcome = EvaluationOutcome::new(disk_resources, total_cached);
     Ok(ExecutionOutcome::Evaluation(outcome))
 }
 
@@ -86,6 +100,7 @@ fn shallow_wipe_disk() -> anyhow::Result<ExecutionOutcome> {
         DiskCached::Shared(UserLevelDiskCache::GradleDaemonLogs),
         DiskCached::Shared(UserLevelDiskCache::GradleTemporaryFiles),
         DiskCached::Shared(UserLevelDiskCache::MavenLocalRepository),
+        DiskCached::Shared(UserLevelDiskCache::KonanCaches),
         DiskCached::Standalone(ProjectLevelDiskCache::BuildOutput),
     ];
 
@@ -99,6 +114,7 @@ fn deep_wipe_ram_disk() -> anyhow::Result<ExecutionOutcome> {
         DiskCached::Shared(UserLevelDiskCache::GradleDaemonLogs),
         DiskCached::Shared(UserLevelDiskCache::GradleTemporaryFiles),
         DiskCached::Shared(UserLevelDiskCache::MavenLocalRepository),
+        DiskCached::Shared(UserLevelDiskCache::KonanCaches),
         DiskCached::Shared(UserLevelDiskCache::GradleJDKToolchains),
         DiskCached::Shared(UserLevelDiskCache::GradleNativeFiles),
         DiskCached::Shared(UserLevelDiskCache::GradleBuildScans),

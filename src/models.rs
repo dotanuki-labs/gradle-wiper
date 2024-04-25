@@ -74,6 +74,7 @@ pub enum UserLevelDiskCache {
     GradleBuildScans,
     GradleOtherCaches,
     MavenLocalRepository,
+    KonanCaches,
 }
 
 impl Display for UserLevelDiskCache {
@@ -89,6 +90,7 @@ impl Display for UserLevelDiskCache {
             UserLevelDiskCache::GradleBuildScans => "Gradle build-scans data",
             UserLevelDiskCache::GradleOtherCaches => "Other files on Gradle Home",
             UserLevelDiskCache::MavenLocalRepository => "Maven local repository",
+            UserLevelDiskCache::KonanCaches => "Konan/KMP Caches",
         };
 
         formatter.write_str(name)
@@ -107,6 +109,7 @@ impl UserLevelDiskCache {
             UserLevelDiskCache::GradleNativeFiles => ".gradle/native",
             UserLevelDiskCache::GradleBuildScans => ".gradle/build-scan-data",
             UserLevelDiskCache::MavenLocalRepository => ".m2",
+            UserLevelDiskCache::KonanCaches => ".konan",
             UserLevelDiskCache::GradleOtherCaches => "",
         };
 
