@@ -62,7 +62,7 @@ cargo-plugins-ci:
     @echo "→ Installing Cargo plugins (CI)"
     yes | cargo binstall cargo-deny --secure --force
     yes | cargo binstall cargo-cyclonedx --secure --force
-    yes | cargo binstall cargo-zigbuild --secure --force
+    yes | cargo binstall cargo-zigbuild@0.18.3 --secure --force
     yes | cargo binstall cargo-nextest --secure --force
     yes | cargo binstall cargo-get --secure --force
     yes | cargo binstall cargo-msrv --secure --force

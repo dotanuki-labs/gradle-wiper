@@ -6,9 +6,10 @@ use crate::models::{
     AllocatedResource, DiskCached, EvaluationOutcome, ExecutionOutcome, MachineResource, ProjectLevelDiskCache,
     UserLevelDiskCache, WipeAction, WipingOutcome,
 };
+use crate::ram::{convert_to_allocated_resources, find_resources_used_by_jvm, locate_hsperfdata_dir};
 use log::debug;
 use std::path::PathBuf;
-use ubyte::{ByteUnit, ToByteUnit};
+use ubyte::ByteUnit;
 use MachineResource::{DiskSpace, RamMemory};
 use WipeAction::{DeepWipe, Evaluate, ShallowWipe};
 
@@ -28,9 +29,9 @@ pub fn execute(target: &MachineResource, action: WipeAction) -> anyhow::Result<E
 }
 
 fn evaluate_ram_memory() -> anyhow::Result<ExecutionOutcome> {
-    // todo : real implementation to come
-    let resources: Vec<AllocatedResource> = vec![];
-    let outcome = EvaluationOutcome::new(resources, 0.megabytes());
+    let resources = find_resources_used_by_jvm(locate_hsperfdata_dir, convert_to_allocated_resources)?;
+    let total_memory = calculate_total_allocated(&resources);
+    let outcome = EvaluationOutcome::new(resources, total_memory);
     Ok(ExecutionOutcome::Evaluation(outcome))
 }
 

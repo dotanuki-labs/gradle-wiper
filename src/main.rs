@@ -4,6 +4,7 @@
 mod cli;
 mod disk;
 mod models;
+mod ram;
 mod wiper;
 
 fn main() -> anyhow::Result<()> {

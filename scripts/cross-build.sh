@@ -28,7 +28,6 @@ cross_build_full() {
 
 cross_build_simple() {
     cross_compile "x86_64-unknown-linux-gnu"
-    cross_compile "aarch64-apple-darwin"
 }
 
 usage() {
