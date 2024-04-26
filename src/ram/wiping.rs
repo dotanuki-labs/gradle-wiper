@@ -9,6 +9,9 @@ use std::path::PathBuf;
 use sysinfo::Pid;
 
 pub fn cleanup_memory(hsperfdata_locator: fn() -> PathBuf, caches: &[MemoryCached]) {
+    debug!("Cleaning up JVM processes");
+    debug!("");
+
     let jvm_processes = find_jvm_processes(hsperfdata_locator).unwrap_or_default();
     let mut system = sysinfo::System::new_all();
     system.refresh_all();
