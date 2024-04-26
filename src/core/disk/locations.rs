@@ -1,8 +1,8 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
-use crate::disk::user_home_locator;
-use crate::models::{DiskCached, ProjectLevelDiskCache};
+use crate::core::disk::user_home_locator;
+use crate::core::models::{DiskCached, ProjectLevelDiskCache};
 use cached::proc_macro::cached;
 use log::debug;
 use std::path::{Path, PathBuf};
@@ -90,7 +90,7 @@ fn ensure_gradle_project(entry: &DirEntry) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use crate::disk::find_all_gradle_projects;
+    use crate::core::disk::find_all_gradle_projects;
     use std::fs;
     use temp_dir::TempDir;
 

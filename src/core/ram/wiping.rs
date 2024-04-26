@@ -1,9 +1,9 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
-use crate::models::MemoryCached;
-use crate::ram::jps::find_jvm_processes;
-use crate::ram::resources::memory_type_from_jvm_launcher_class;
+use crate::core::models::MemoryCached;
+use crate::core::ram::jps::find_jvm_processes;
+use crate::core::ram::memory_type_from_jvm_launcher_class;
 use log::debug;
 use std::path::PathBuf;
 use sysinfo::Pid;

@@ -1,11 +1,10 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
+use crate::core::wiper;
+
 mod cli;
-mod disk;
-mod models;
-mod ram;
-mod wiper;
+mod core;
 
 fn main() -> anyhow::Result<()> {
     let (target_resource, wipe_action, verbose_mode) = cli::parsed_arguments();
