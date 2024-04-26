@@ -5,7 +5,7 @@ pull_request_rules:
   - name: Automatic merges for Renovate pull requests
     conditions:
       - author~=^renovate\[bot\]$
-      - check-success=build
+      - check-success=security-checks
     actions:
       merge:
         method: squash
@@ -13,7 +13,7 @@ pull_request_rules:
   - name: Be author's friend
     conditions:
       - author~=^ubiratansoares
-      - check-success=build
+      - check-success=security-checks
     actions:
       merge:
         method: squash
