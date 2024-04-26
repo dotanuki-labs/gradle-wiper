@@ -1,12 +1,9 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
-use crate::disk;
-use crate::models::{
-    AllocatedResource, DiskCached, EvaluationOutcome, ExecutionOutcome, MachineResource, MemoryCached,
-    ProjectLevelDiskCache, UserLevelDiskCache, WipeAction, WipingOutcome,
-};
-use crate::ram::{cleanup_memory, convert_to_allocated_resources, find_resources_used_by_jvm, locate_hsperfdata_dir};
+use crate::models::*;
+use crate::ram::find_resources_used_by_jvm;
+use crate::{disk, ram};
 use log::debug;
 use std::path::PathBuf;
 use ubyte::ByteUnit;
@@ -29,7 +26,7 @@ pub fn execute(target: &MachineResource, action: WipeAction) -> anyhow::Result<E
 }
 
 fn evaluate_ram_memory() -> anyhow::Result<ExecutionOutcome> {
-    let resources = find_resources_used_by_jvm(locate_hsperfdata_dir, convert_to_allocated_resources)?;
+    let resources = ram::find_resources_used_by_jvm(ram::locate_hsperfdata_dir, ram::convert_to_allocated_resources)?;
     let total_memory = calculate_total_allocated(&resources);
     let outcome = EvaluationOutcome::new(resources, total_memory);
     Ok(ExecutionOutcome::Evaluation(outcome))
@@ -50,12 +47,12 @@ fn deep_wipe_ram() -> anyhow::Result<ExecutionOutcome> {
 }
 
 fn wipe_ram(caches_to_remove: Vec<MemoryCached>) -> anyhow::Result<ExecutionOutcome> {
-    let resources_before = find_resources_used_by_jvm(locate_hsperfdata_dir, convert_to_allocated_resources)?;
+    let resources_before = find_resources_used_by_jvm(ram::locate_hsperfdata_dir, ram::convert_to_allocated_resources)?;
     let total_memory_before = calculate_total_allocated(&resources_before);
 
-    cleanup_memory(locate_hsperfdata_dir, &caches_to_remove);
+    ram::cleanup_memory(ram::locate_hsperfdata_dir, &caches_to_remove);
 
-    let resources_after = find_resources_used_by_jvm(locate_hsperfdata_dir, convert_to_allocated_resources)?;
+    let resources_after = find_resources_used_by_jvm(ram::locate_hsperfdata_dir, ram::convert_to_allocated_resources)?;
     let total_memory_after = calculate_total_allocated(&resources_after);
 
     let reclaimed = total_memory_before - total_memory_after;
