@@ -51,8 +51,11 @@ jobs:
         run: just e2e
 
   build:
-    runs-on: ubuntu-22.04
     needs: essential-checks
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ 'ubuntu-22.04', 'macos-14' ]
 
     steps:
       - name: Project Checkout
@@ -63,21 +66,26 @@ jobs:
         with:
             save-if: ${{ github.ref == 'refs/heads/main' }}
 
-      - name: Install additional tools
+      - name: Install additional tools (Mac)
+        if: runner.os == 'macOS'
+        run: brew install just coreutils zig
+
+      - name: Install additional tools (Linux)
+        if: runner.os == 'Linux'
         run: |
-            sudo snap install --edge --classic just
-            sudo snap install zig --classic --beta && zig version
+          sudo snap install --edge --classic just
+          sudo snap install zig --classic --beta && zig version
 
       - name: Setup Rust and Cargo plugins
         run: just setup-ci
 
       - name: Cross-compilation against some targets
-        run: just cross-build-pull-request
+        run: just flexible-build
 
       - name: Archive binaries
         uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
         with:
-            name: gradle-wiper-binaries
+            name: gradle-wiper-binaries-${{ runner.os }}
             path: target/ci
 
   security-checks:

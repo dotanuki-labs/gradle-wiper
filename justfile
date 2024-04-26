@@ -35,14 +35,8 @@ lint: toolchain
     cargo clippy --all-targets --all-features -- -D warnings -W clippy::unwrap_used
     @echo
 
-# Build project against the local toolchain
-simple-build: toolchain
-    @echo "→ Compile project and build binary"
-    cargo build
-    @echo
-
 # Run Tests
-tests: simple-build
+tests:
     @echo "→ Run project tests"
     cargo nextest run
     @echo
@@ -62,10 +56,10 @@ cargo-plugins-ci:
     @echo "→ Installing Cargo plugins (CI)"
     yes | cargo binstall cargo-deny --secure --force
     yes | cargo binstall cargo-cyclonedx --secure --force
-    yes | cargo binstall cargo-zigbuild@0.18.3 --secure --force
     yes | cargo binstall cargo-nextest --secure --force
     yes | cargo binstall cargo-get --secure --force
     yes | cargo binstall cargo-msrv --secure --force
+    yes | cargo binstall cargo-zigbuild --secure --force
     @echo
 
 # Performs setup for this project (CI)
@@ -73,16 +67,10 @@ setup-ci: toolchain cargo-plugins-ci
     @echo "✅ Setup (CI) concluded"
     @echo
 
-# Build project against some supported targets
-cross-build-pull-request:
-    @echo "→ Build project against some supported targets"
-    ./scripts/cross-build.sh simple
-    @echo
-
-# Build project against some supported targets
-cross-build-release:
-    @echo "→ Build project against all supported targets"
-    ./scripts/cross-build.sh full
+# Build project according to local or CI environment
+flexible-build:
+    @echo "→ Build project according to local or CI environment"
+    ./scripts/flex-build.sh
     @echo
 
 # Generates supply-chain related artifacts

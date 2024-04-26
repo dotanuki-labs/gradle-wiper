@@ -4,9 +4,11 @@
 
 set -euo pipefail
 
+# https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
+readonly platform="${RUNNER_OS:-local}"
 readonly output_dir="target/ci"
 
-cross_compile() {
+build() {
     local target="$1"
 
     rustup target add "$target"
@@ -18,45 +20,40 @@ cross_compile() {
     sha256sum "$binary" >>"$output_dir"/gradle-wiper-"$target"-sha256
 }
 
-cross_build_full() {
-    for platform in apple-darwin unknown-linux-gnu; do
-        for arch in x86_64 aarch64; do
-            cross_compile "$arch-$platform"
-        done
+local_build() {
+    cargo build --release
+}
+
+ci_build_mac() {
+    for arch in x86_64 aarch64; do
+        build "$arch-apple-darwin"
     done
 }
 
-cross_build_simple() {
-    cross_compile "x86_64-unknown-linux-gnu"
+ci_build_linux() {
+    for arch in x86_64 aarch64; do
+        build "$arch-unknown-linux-gnu"
+    done
 }
-
-usage() {
-    echo "Usage"
-    echo
-    echo "‣ cross-build.sh (default mode : simple)"
-    echo "‣ cross-build.sh simple"
-    echo "‣ cross-build.sh full"
-}
-
-readonly mode="${1:-simple}"
 
 echo
 
 dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "${dir%/*}"
-
 rm -rf "$output_dir" && mkdir -p "$output_dir"
 
-case "$mode" in
-"simple")
-    cross_build_simple
+case "$platform" in
+"local")
+    ci_build_mac
     ;;
-"full")
-    cross_build_full
+"macOS")
+    ci_build_mac
+    ;;
+"Linux")
+    ci_build_linux
     ;;
 *)
-    echo "Error: Invalid cross-build mode → $mode"
-    usage
+    echo "Error: unsupported platform → $platform"
     echo
     exit 1
     ;;
