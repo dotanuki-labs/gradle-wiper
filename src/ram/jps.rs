@@ -1,6 +1,7 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
+use log::debug;
 use rust_strings::BytesConfig;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -30,6 +31,12 @@ pub fn find_jvm_processes(hsperfdata_locator: fn() -> PathBuf) -> anyhow::Result
         .zip(launcher_class_names)
         .filter(|(_, class_name)| !class_name.contains("sun"))
         .collect::<Vec<_>>();
+
+    debug!("");
+    processes
+        .iter()
+        .for_each(|(pid, launcher)| debug!("Launcher class : {launcher} ({pid})"));
+    debug!("");
 
     Ok(processes)
 }
