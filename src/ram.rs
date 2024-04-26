@@ -3,6 +3,7 @@
 
 use crate::models::{AllocatedResource, MemoryCached, UseCase};
 use itertools::Itertools;
+use log::debug;
 use rust_strings::BytesConfig;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -19,11 +20,69 @@ pub fn locate_hsperfdata_dir() -> PathBuf {
 
 pub fn find_resources_used_by_jvm(
     hsperfdata_locator: fn() -> PathBuf,
-    resources_converter: fn(u32, String) -> (MemoryCached, u64),
+    resources_converter: fn(u32, String) -> Option<(MemoryCached, u64)>,
 ) -> anyhow::Result<Vec<AllocatedResource>> {
-    let jvm_perf_data_path = hsperfdata_locator();
+    let jvm_processes = find_jvm_processes(hsperfdata_locator)?;
 
-    dbg!(jvm_perf_data_path.as_path());
+    let resources = jvm_processes
+        .into_iter()
+        .filter_map(|(pid, class_name)| resources_converter(pid, class_name))
+        .sorted_by_key(|item| item.0)
+        .map(|(cached, memory)| (UseCase::from(cached), memory))
+        .sorted_by_key(|item| item.0)
+        .group_by(|item| item.0)
+        .into_iter()
+        .map(|(use_case, group)| {
+            (
+                use_case,
+                group.fold(ByteUnit::from(0), |total, (_, entry_size)| total + entry_size),
+            )
+        })
+        .map(|(use_case, total_memory)| AllocatedResource::new(use_case, total_memory))
+        .collect::<Vec<_>>();
+
+    Ok(resources)
+}
+
+pub fn convert_to_allocated_resources(pid: u32, launcher_class_name: String) -> Option<(MemoryCached, u64)> {
+    let mut system = sysinfo::System::new_all();
+    system.refresh_all();
+
+    system.process(Pid::from_u32(pid)).map(|process| {
+        (
+            memory_type_from_jvm_launcher_class(&launcher_class_name),
+            process.memory(),
+        )
+    })
+}
+
+pub fn wipe_ram(hsperfdata_locator: fn() -> PathBuf, caches: &[MemoryCached]) {
+    let jvm_processes = find_jvm_processes(hsperfdata_locator).unwrap_or_default();
+    let mut system = sysinfo::System::new_all();
+    system.refresh_all();
+
+    jvm_processes.into_iter().for_each(|(pid, launcher_class_name)| {
+        let cache_type = memory_type_from_jvm_launcher_class(&launcher_class_name);
+        if caches.contains(&cache_type) {
+            if let Some(process) = system.process(Pid::from_u32(pid)) {
+                if process.kill() {
+                    debug!("Killed : {} ({})", &launcher_class_name, pid);
+                }
+            }
+        }
+    })
+}
+
+fn memory_type_from_jvm_launcher_class(launcher_class_name: &str) -> MemoryCached {
+    match launcher_class_name {
+        _ if launcher_class_name.to_lowercase().contains("kotlin") => MemoryCached::KotlinCompilerDaemon,
+        _ if launcher_class_name.to_lowercase().contains("gradle") => MemoryCached::GradleBuildDaemon,
+        _ => MemoryCached::OtherJavaProcess,
+    }
+}
+
+fn find_jvm_processes(hsperfdata_locator: fn() -> PathBuf) -> anyhow::Result<Vec<(u32, String)>> {
+    let jvm_perf_data_path = hsperfdata_locator();
 
     let jps_paths = fs::read_dir(jvm_perf_data_path)?
         .filter_map(|entry| entry.ok())
@@ -42,38 +101,13 @@ pub fn find_resources_used_by_jvm(
         .map(launcher_class_from_monitored_process)
         .collect::<Vec<_>>();
 
-    let resources = pids
+    let processes = pids
         .into_iter()
         .zip(launcher_class_names)
         .filter(|(_, class_name)| !class_name.contains("sun"))
-        .map(|(pid, class_name)| resources_converter(pid, class_name))
-        .sorted_by_key(|item| item.0)
-        .map(|(cached, memory)| (UseCase::from(cached), memory))
-        .group_by(|item| item.0)
-        .into_iter()
-        .map(|(use_case, group)| {
-            (
-                use_case,
-                group.fold(ByteUnit::from(0), |total, (_, entry_size)| total + entry_size),
-            )
-        })
-        .map(|(use_case, total_memory)| AllocatedResource::new(use_case, total_memory))
         .collect::<Vec<_>>();
 
-    Ok(resources)
-}
-
-pub fn convert_to_allocated_resources(pid: u32, launcher_class_name: String) -> (MemoryCached, u64) {
-    let memory_type = match &launcher_class_name {
-        _ if launcher_class_name.to_lowercase().contains("kotlin") => MemoryCached::KotlinCompilerDaemon,
-        _ if launcher_class_name.to_lowercase().contains("gradle") => MemoryCached::GradleBuildDaemon,
-        _ => MemoryCached::OtherJavaProcess,
-    };
-
-    let system = sysinfo::System::new_all();
-    let process = system.process(Pid::from_u32(pid)).expect("Cannot find JVM process");
-
-    (memory_type, process.memory())
+    Ok(processes)
 }
 
 fn pid_from_jps_file(path_to_file: &Path) -> u32 {
@@ -116,8 +150,8 @@ mod tests {
         root_dir.join("test-data").join("hsperf")
     }
 
-    fn fake_resources_converter(_: u32, launcher_name: String) -> (MemoryCached, u64) {
-        match &launcher_name {
+    fn fake_resources_converter(_: u32, launcher_name: String) -> Option<(MemoryCached, u64)> {
+        let converted = match &launcher_name {
             _ if launcher_name.to_lowercase().contains("kotlin") => {
                 (MemoryCached::KotlinCompilerDaemon, 1.gibibytes().as_u64())
             },
@@ -125,7 +159,9 @@ mod tests {
                 (MemoryCached::GradleBuildDaemon, 2.gibibytes().as_u64())
             },
             _ => (MemoryCached::OtherJavaProcess, 3.gibibytes().as_u64()),
-        }
+        };
+
+        Some(converted)
     }
 
     #[test]

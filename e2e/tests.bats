@@ -49,7 +49,6 @@ current_dir="$(cd "$(dirname "$BATS_TEST_FILENAME")" >/dev/null 2>&1 && pwd)"
     run $HOME/aaw/gradlew shadowJar -q -p $HOME/aaw
     run gradle-wiper disk deep
 
-    echo "$output"
     [[ "$output" == *"Reclaimed disk space"* ]]
     [ "$status" -eq 0 ]
 
@@ -72,4 +71,16 @@ current_dir="$(cd "$(dirname "$BATS_TEST_FILENAME")" >/dev/null 2>&1 && pwd)"
 
     [[ "$output" == *"Total resources (RAM memory)"* ]]
     [ "$status" -eq 0 ]
+}
+
+@test "should perform ram wiping" {
+    run $HOME/aaw/gradlew shadowJar -q -p $HOME/aaw
+    run gradle-wiper ram shallow
+
+    [[ "$output" == *"Reclaimed RAM memory"* ]]
+    [ "$status" -eq 0 ]
+
+    [ $(jps | grep Jps | wc -l) -eq 1 ]
+    [ $(jps | grep Gradle | wc -l) -eq 0 ]
+    [ $(jps | grep Kotlin | wc -l) -eq 0 ]
 }
