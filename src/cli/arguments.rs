@@ -1,7 +1,7 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
-use crate::models::{MachineResource, WipeAction};
+use crate::core::models::{MachineResource, WipeAction};
 use clap::{Args, Parser, Subcommand, ValueEnum};
 
 #[derive(ValueEnum, Debug, Clone)]

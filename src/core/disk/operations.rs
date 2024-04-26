@@ -30,7 +30,7 @@ pub fn cleanup_resources(paths_to_remove: &[PathBuf]) {
 
 #[cfg(test)]
 mod tests {
-    use crate::disk::cleanup_resources;
+    use crate::core::disk::cleanup_resources;
     use std::fs;
     use std::path::PathBuf;
     use temp_dir::TempDir;

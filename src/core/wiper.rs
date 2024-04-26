@@ -1,13 +1,16 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
-use crate::models::*;
-use crate::ram::find_resources_used_by_jvm;
-use crate::{disk, ram};
+use crate::core::models::MachineResource::{DiskSpace, RamMemory};
+use crate::core::models::{
+    AllocatedResource, DiskCached, EvaluationOutcome, ExecutionOutcome, MachineResource, MemoryCached,
+    ProjectLevelDiskCache, UserLevelDiskCache, WipeAction, WipingOutcome,
+};
+use crate::core::ram::find_resources_used_by_jvm;
+use crate::core::{disk, ram};
 use log::debug;
 use std::path::PathBuf;
 use ubyte::ByteUnit;
-use MachineResource::{DiskSpace, RamMemory};
 use WipeAction::{DeepWipe, Evaluate, ShallowWipe};
 
 pub fn execute(target: &MachineResource, action: WipeAction) -> anyhow::Result<ExecutionOutcome> {

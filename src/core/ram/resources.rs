@@ -1,8 +1,8 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
-use crate::models::{AllocatedResource, MemoryCached, UseCase};
-use crate::ram::jps::find_jvm_processes;
+use crate::core::models::{AllocatedResource, MemoryCached, UseCase};
+use crate::core::ram::jps::find_jvm_processes;
 use itertools::Itertools;
 use std::path::PathBuf;
 use sysinfo::Pid;
@@ -56,8 +56,8 @@ pub fn memory_type_from_jvm_launcher_class(launcher_class_name: &str) -> MemoryC
 
 #[cfg(test)]
 mod tests {
-    use crate::models::{AllocatedResource, MemoryCached, UseCase};
-    use crate::ram::resources::find_resources_used_by_jvm;
+    use crate::core::models::{AllocatedResource, MemoryCached, UseCase};
+    use crate::core::ram::find_resources_used_by_jvm;
     use std::path::PathBuf;
     use ubyte::{ByteUnit, ToByteUnit};
 

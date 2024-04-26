@@ -1,7 +1,7 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
-use crate::models::{AllocatedResource, ProjectLevelDiskCache, UseCase, UserLevelDiskCache};
+use crate::core::models::{AllocatedResource, ProjectLevelDiskCache, UseCase, UserLevelDiskCache};
 use itertools::Itertools;
 use std::path::{Path, PathBuf};
 use ubyte::ByteUnit;
@@ -123,10 +123,10 @@ fn evaluate_use_case_from_gradle_home(entry: &DirEntry) -> UseCase {
 
 #[cfg(test)]
 mod tests {
-    use crate::disk::resources::{
+    use crate::core::disk::{
         resources_used_by_gradle_home, resources_used_by_gradle_projects, resources_used_by_maven_local_repository,
     };
-    use crate::models::{AllocatedResource, ProjectLevelDiskCache, UseCase, UserLevelDiskCache};
+    use crate::core::models::{AllocatedResource, ProjectLevelDiskCache, UseCase, UserLevelDiskCache};
     use fake::{Fake, StringFaker};
     use std::fs;
     use std::fs::File;

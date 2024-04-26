@@ -1,7 +1,7 @@
 // Copyright 2024 Dotanuki Labs
 // SPDX-License-Identifier: MIT
 
-use crate::models::{EvaluationOutcome, ExecutionOutcome, MachineResource, WipingOutcome};
+use crate::core::models::{EvaluationOutcome, ExecutionOutcome, MachineResource, WipingOutcome};
 use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
 use comfy_table::{ContentArrangement, Table};
