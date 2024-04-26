@@ -6,7 +6,7 @@ use crate::models::{
     AllocatedResource, DiskCached, EvaluationOutcome, ExecutionOutcome, MachineResource, MemoryCached,
     ProjectLevelDiskCache, UserLevelDiskCache, WipeAction, WipingOutcome,
 };
-use crate::ram::{convert_to_allocated_resources, find_resources_used_by_jvm, locate_hsperfdata_dir, wipe_ram};
+use crate::ram::{cleanup_memory, convert_to_allocated_resources, find_resources_used_by_jvm, locate_hsperfdata_dir};
 use log::debug;
 use std::path::PathBuf;
 use ubyte::ByteUnit;
@@ -36,12 +36,24 @@ fn evaluate_ram_memory() -> anyhow::Result<ExecutionOutcome> {
 }
 
 fn shallow_wipe_ram() -> anyhow::Result<ExecutionOutcome> {
+    let caches_to_remove = vec![MemoryCached::GradleBuildDaemon, MemoryCached::KotlinCompilerDaemon];
+    wipe_ram(caches_to_remove)
+}
+
+fn deep_wipe_ram() -> anyhow::Result<ExecutionOutcome> {
+    let caches_to_remove = vec![
+        MemoryCached::GradleBuildDaemon,
+        MemoryCached::KotlinCompilerDaemon,
+        MemoryCached::OtherJavaProcess,
+    ];
+    wipe_ram(caches_to_remove)
+}
+
+fn wipe_ram(caches_to_remove: Vec<MemoryCached>) -> anyhow::Result<ExecutionOutcome> {
     let resources_before = find_resources_used_by_jvm(locate_hsperfdata_dir, convert_to_allocated_resources)?;
     let total_memory_before = calculate_total_allocated(&resources_before);
 
-    let caches_to_remove = vec![MemoryCached::GradleBuildDaemon, MemoryCached::KotlinCompilerDaemon];
-
-    wipe_ram(locate_hsperfdata_dir, &caches_to_remove);
+    cleanup_memory(locate_hsperfdata_dir, &caches_to_remove);
 
     let resources_after = find_resources_used_by_jvm(locate_hsperfdata_dir, convert_to_allocated_resources)?;
     let total_memory_after = calculate_total_allocated(&resources_after);
@@ -50,10 +62,6 @@ fn shallow_wipe_ram() -> anyhow::Result<ExecutionOutcome> {
 
     let outcome = WipingOutcome::new(RamMemory, reclaimed);
     Ok(ExecutionOutcome::Wiping(outcome))
-}
-
-fn deep_wipe_ram() -> anyhow::Result<ExecutionOutcome> {
-    todo!()
 }
 
 fn evaluate_disk_space() -> anyhow::Result<ExecutionOutcome> {
