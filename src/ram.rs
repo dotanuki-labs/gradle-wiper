@@ -56,7 +56,7 @@ pub fn convert_to_allocated_resources(pid: u32, launcher_class_name: String) -> 
     })
 }
 
-pub fn wipe_ram(hsperfdata_locator: fn() -> PathBuf, caches: &[MemoryCached]) {
+pub fn cleanup_memory(hsperfdata_locator: fn() -> PathBuf, caches: &[MemoryCached]) {
     let jvm_processes = find_jvm_processes(hsperfdata_locator).unwrap_or_default();
     let mut system = sysinfo::System::new_all();
     system.refresh_all();
