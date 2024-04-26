@@ -21,6 +21,35 @@ jobs:
         with:
           file-patterns: '*.sh,*.rs,*.yml,*.bats,*Dockerfile'
           license: 'mit'
+
+  tests:
+    runs-on: ubuntu-22.04
+    needs: essential-checks
+
+    steps:
+      - name: Project Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Setup CI caching
+        uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
+        with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Install additional tools
+        run: sudo snap install --edge --classic just
+
+      - name: Setup Rust and Cargo plugins
+        run: just setup-ci
+
+      - name: Check code smells
+        run: just lint
+
+      - name: Run unit tests
+        run: just tests
+
+      - name: Run E2E tests
+        run: just e2e
+
   build:
     runs-on: ubuntu-22.04
     needs: essential-checks
@@ -42,32 +71,42 @@ jobs:
       - name: Setup Rust and Cargo plugins
         run: just setup-ci
 
-      - name: Check code smells
-        run: just lint
-
-      - name: Check supply-chain issues
-        run: just supply-chain-checks
-
-      - name: Check MSRV
-        run: just msrv-check
-
       - name: Cross-compilation against some targets
         run: just cross-build-pull-request
-
-      - name: Run unit tests
-        run: just tests
-
-      - name: Run E2E tests
-        run: just e2e
-
-      - name: Archive SBOM
-        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
-        with:
-            name: sbom-${{ github.sha }}.json
-            path: gradle-wiper.cdx.json
 
       - name: Archive binaries
         uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
         with:
             name: gradle-wiper-binaries
             path: target/ci
+
+  security-checks:
+    runs-on: ubuntu-22.04
+    needs: [build, tests]
+
+    steps:
+      - name: Project Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Setup CI caching
+        uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
+        with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Install additional tools
+        run: sudo snap install --edge --classic just
+
+      - name: Setup Rust and Cargo plugins
+        run: just setup-ci
+
+      - name: Check MSRV
+        run: just msrv-check
+
+      - name: Check supply-chain issues
+        run: just supply-chain-checks
+
+      - name: Archive SBOM
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        with:
+          name: sbom-${{ github.sha }}.json
+          path: gradle-wiper.cdx.json
