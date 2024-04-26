@@ -33,6 +33,7 @@ fn used_resources(resource: &MachineResource, outcome: &EvaluationOutcome) {
         .collect::<Vec<_>>();
 
     let mut table = Table::new();
+
     table
         .load_preset(UTF8_FULL)
         .apply_modifier(UTF8_ROUND_CORNERS)
@@ -41,7 +42,7 @@ fn used_resources(resource: &MachineResource, outcome: &EvaluationOutcome) {
         .set_header(vec!["What", "Total Size"])
         .add_rows(rows);
 
-    info!("{table}");
+    println!("{table}");
 
     info!("");
     info!("Total resources ({}) : {:.1}", resource, &outcome.total_size);

@@ -18,6 +18,19 @@ current_dir="$(cd "$(dirname "$BATS_TEST_FILENAME")" >/dev/null 2>&1 && pwd)"
     [ "$status" -eq 0 ]
 }
 
+@test "should show no usages" {
+    run $HOME/aaw/gradlew tasks -q -p $HOME/aaw
+    run gradle-wiper disk evaluate
+
+    [[ "$output" == *"No usages"* ]]
+    [ "$status" -eq 0 ]
+
+    run gradle-wiper ram evaluate
+
+    [[ "$output" == *"No usages"* ]]
+    [ "$status" -eq 0 ]
+}
+
 @test "should detect usages of disk" {
     run $HOME/aaw/gradlew tasks -q -p $HOME/aaw
     run gradle-wiper disk evaluate
@@ -64,4 +77,12 @@ current_dir="$(cd "$(dirname "$BATS_TEST_FILENAME")" >/dev/null 2>&1 && pwd)"
     [ ! -d $HOME/.m2 ]
     [ ! -d $HOME/aaw/build ]
     [ ! -d $HOME/aaw/.gradle ]
+}
+
+@test "should detect usages of ram" {
+    run $HOME/aaw/gradlew tasks -q -p $HOME/aaw
+    run gradle-wiper ram evaluate
+
+    [[ "$output" == *"Total resources (ram memory)"* ]]
+    [ "$status" -eq 0 ]
 }

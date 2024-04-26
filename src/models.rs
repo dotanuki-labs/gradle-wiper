@@ -41,21 +41,19 @@ impl Display for WipeAction {
     }
 }
 
-#[allow(dead_code)]
-#[allow(clippy::enum_variant_names)]
 #[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, PartialOrd, Ord)]
 pub enum MemoryCached {
-    GradleWorkerDaemon,
+    GradleBuildDaemon,
     KotlinCompilerDaemon,
-    GroovyCompilerDaemon,
+    OtherJavaProcess,
 }
 
 impl Display for MemoryCached {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> std::fmt::Result {
         let name = match self {
-            MemoryCached::GradleWorkerDaemon => "Gradle Daemon",
+            MemoryCached::GradleBuildDaemon => "Gradle Daemon",
             MemoryCached::KotlinCompilerDaemon => "Kotlin Daemon",
-            MemoryCached::GroovyCompilerDaemon => "Groovy Daemon",
+            MemoryCached::OtherJavaProcess => "Other JVM process",
         };
 
         formatter.write_str(name)
@@ -121,7 +119,6 @@ impl UserLevelDiskCache {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Debug, PartialEq, Eq, Hash, Copy, Clone, PartialOrd, Ord)]
 pub enum ProjectLevelDiskCache {
     BuildOutput,
@@ -187,7 +184,6 @@ impl From<UserLevelDiskCache> for UseCase {
     }
 }
 
-#[allow(dead_code)]
 impl From<MemoryCached> for UseCase {
     fn from(value: MemoryCached) -> Self {
         UseCase::Memory(value)

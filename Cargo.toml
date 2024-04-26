@@ -26,6 +26,9 @@ ubyte = "0.10.4"
 cached = "0.49.3"
 env_logger = { version = "0.11.3", features = ["color"]}
 log = "0.4.21"
+whoami = "1.5.1"
+rust-strings = "0.6.0"
+sysinfo = "0.30.11"
 
 [dev-dependencies]
 fake = "2.9.2"
