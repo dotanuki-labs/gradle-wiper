@@ -59,6 +59,7 @@ cargo-plugins-ci:
     yes | cargo binstall cargo-nextest --secure --force
     yes | cargo binstall cargo-get --secure --force
     yes | cargo binstall cargo-msrv --secure --force
+    yes | cargo binstall cargo-zigbuild --secure --force
     @echo
 
 # Performs setup for this project (CI)

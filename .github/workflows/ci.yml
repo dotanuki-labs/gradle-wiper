@@ -68,11 +68,16 @@ jobs:
 
       - name: Install additional tools (Mac)
         if: runner.os == 'macOS'
-        run: brew install just coreutils
+        run: brew install just coreutils zig
 
       - name: Install additional tools (Linux)
         if: runner.os == 'Linux'
-        run: sudo snap install --edge --classic just
+        run: |
+          sudo snap install --edge --classic just
+          sudo snap install zig --classic --beta && zig version
+
+      - name: Setup Rust and Cargo plugins
+        run: just setup-ci
 
       - name: Cross-compilation against some targets
         run: just flexible-build
@@ -96,7 +101,7 @@ jobs:
         with:
           save-if: ${{ github.ref == 'refs/heads/main' }}
 
-      - name: Install additional tools (Linux)
+      - name: Install additional tools
         run: sudo snap install --edge --classic just
 
       - name: Setup Rust and Cargo plugins
