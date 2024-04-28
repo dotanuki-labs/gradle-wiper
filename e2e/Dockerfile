@@ -5,8 +5,9 @@ FROM azul/zulu-openjdk:21-latest
 
 RUN apt-get update && apt-get install -y git openssh-client bats
 RUN cd $HOME && mkdir -p $HOME/.ssh
+RUN mkdir $HOME/IdeaProjects
 RUN ssh-keyscan -t rsa github.com >> $HOME/.ssh/known_hosts
-RUN git clone https://github.com/dotanuki-labs/android-archives-watchdog.git $HOME/aaw
+RUN git clone https://github.com/dotanuki-labs/android-archives-watchdog.git $HOME/IdeaProjects/aaw
 
 COPY e2e/disk.bats /usr/disk.bats
 COPY e2e/ram.bats /usr/ram.bats

@@ -10,7 +10,7 @@
 }
 
 @test "should detect usages of disk" {
-    run $HOME/aaw/gradlew tasks -q -p $HOME/aaw
+    run $HOME/IdeaProjects/aaw/gradlew tasks -q -p $HOME/IdeaProjects/aaw
     run gradle-wiper disk evaluate
 
     [[ "$output" == *"Total resources (disk space)"* ]]
@@ -18,7 +18,7 @@
 }
 
 @test "should perform disk shallow wiping" {
-    run $HOME/aaw/gradlew shadowJar -q -p $HOME/aaw
+    run $HOME/IdeaProjects/aaw/gradlew shadowJar -q -p $HOME/IdeaProjects/aaw
     run gradle-wiper disk shallow
 
     echo "$output"
@@ -30,14 +30,14 @@
     [ ! -d $HOME/.gradle/daemon ]
     [ ! -d $HOME/.gradle/.tmp ]
     [ ! -d $HOME/.gradle/.m2 ]
-    [ ! -d $HOME/aaw/build ]
+    [ ! -d $HOME/IdeaProjects/aaw/build ]
 
     # Do not clean Gradle metadata on shallow wiping
-    [ -d $HOME/aaw/.gradle ]
+    [ -d $HOME/IdeaProjects/aaw/.gradle ]
 }
 
 @test "should perform disk deep wiping" {
-    run $HOME/aaw/gradlew shadowJar -q -p $HOME/aaw
+    run $HOME/IdeaProjects/gradlew shadowJar -q -p $HOME/IdeaProjects/aaw
     run gradle-wiper disk deep
 
     [[ "$output" == *"Reclaimed disk space"* ]]
@@ -52,6 +52,6 @@
     [ ! -d $HOME/.gradle/native ]
     [ ! -d $HOME/.gradle/build-scan-data ]
     [ ! -d $HOME/.m2 ]
-    [ ! -d $HOME/aaw/build ]
-    [ ! -d $HOME/aaw/.gradle ]
+    [ ! -d $HOME/IdeaProjects/aaw/build ]
+    [ ! -d $HOME/IdeaProjects/aaw/.gradle ]
 }

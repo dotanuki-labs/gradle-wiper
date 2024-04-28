@@ -96,7 +96,7 @@ fn evaluate_disk_space() -> anyhow::Result<ExecutionOutcome> {
         debug!("Storage taken by Konan : {}", total_size_for_konan_caches);
     }
 
-    let gradle_projects = disk::find_all_gradle_projects(user_home);
+    let gradle_projects = disk::find_all_gradle_projects(user_home.to_path_buf());
     let gradle_projects_resources = disk::resources_used_by_gradle_projects(&gradle_projects)?;
     let total_size_for_gradle_projects = gradle_projects_resources.amount;
 
@@ -155,7 +155,7 @@ fn wipe_disk(caches_to_remove: Vec<DiskCached>) -> anyhow::Result<ExecutionOutco
 
     let paths_to_remove = caches_to_remove
         .into_iter()
-        .flat_map(|item| disk::find_associated_filepaths(disk::user_home_locator(), item))
+        .flat_map(|item| disk::find_associated_filepaths(disk::user_home_locator().as_path(), item))
         .collect::<Vec<PathBuf>>();
 
     disk::cleanup_resources(&paths_to_remove);
