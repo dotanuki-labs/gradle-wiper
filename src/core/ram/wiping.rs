@@ -9,6 +9,7 @@ use std::path::PathBuf;
 use sysinfo::Pid;
 
 pub fn cleanup_memory(hsperfdata_locator: fn() -> PathBuf, caches: &[MemoryCached]) {
+    debug!("");
     debug!("Cleaning up JVM processes");
     debug!("");
 

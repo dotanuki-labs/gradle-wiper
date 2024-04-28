@@ -1,3 +1,6 @@
+# Copyright 2024 Dotanuki Labs
+# SPDX-License-Identifier: MIT
+
 name: "Setup Rust build"
 description: "Common steps before running a Rust/Cargo task"
 
