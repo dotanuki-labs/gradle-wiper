@@ -63,5 +63,5 @@ jobs:
             artifacts/**/*
             gradle-wiper.cdx.json
 
-#      - name: Publish on crates.io
-#        run: cargo publish --token ${{ secrets.CRATESIO_PUBLISH_TOKEN }}
+      - name: Publish on crates.io
+        run: cargo publish --token ${{ secrets.CRATESIO_PUBLISH_TOKEN }}
