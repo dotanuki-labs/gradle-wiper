@@ -32,8 +32,6 @@ sysinfo = "0.30.11"
 
 [dev-dependencies]
 fake = "2.9.2"
-assert_cmd = "2.0.14"
-predicates = "3.1.0"
 temp-dir = "0.1.13"
 
 [profile.release]
