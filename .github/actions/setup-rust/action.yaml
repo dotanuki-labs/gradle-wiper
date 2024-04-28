@@ -1,0 +1,26 @@
+name: "Setup Rust build"
+description: "Common steps before running a Rust/Cargo task"
+
+runs:
+    using: "composite"
+    steps:
+        - name: Setup CI caching
+          uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
+          with:
+              save-if: ${{ github.ref == 'refs/heads/main' }}
+
+        - name: Install additional tools (Mac)
+          if: runner.os == 'macOS'
+          shell: bash
+          run: brew install just coreutils zig
+
+        - name: Install additional tools (Linux)
+          if: runner.os == 'Linux'
+          shell: bash
+          run: |
+              sudo snap install --edge --classic just
+              sudo snap install zig --classic --beta && zig version
+
+        - name: Setup Rust and Cargo plugins
+          shell: bash
+          run: just setup-ci
