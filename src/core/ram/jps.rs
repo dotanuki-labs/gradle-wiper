@@ -33,20 +33,27 @@ pub fn find_jvm_processes(hsperfdata_locator: fn() -> PathBuf) -> anyhow::Result
         .collect::<Vec<_>>();
 
     debug!("");
+    debug!("Listing launcher packages and PIDs associated with JVM processes:");
+    debug!("");
+
     processes
         .iter()
         .for_each(|(pid, launcher)| debug!("Launcher class : {launcher} ({pid})"));
+
     debug!("");
 
     Ok(processes)
 }
 
 fn pid_from_jps_file(path_to_file: &Path) -> u32 {
+    debug!("Evaluating JPS-related files at : {}", path_to_file.to_string_lossy());
     let file_path_raw_str = path_to_file.file_name().expect("Not a valid path").to_string_lossy();
     file_path_raw_str.parse::<u32>().expect("Cannot parse filename as u32")
 }
 
 fn launcher_class_from_monitored_process(path_to_file: &Path) -> String {
+    debug!("Parsing file : {}", path_to_file.to_string_lossy());
+
     let file_contents_as_bytes = fs::read(path_to_file).expect("Cannot read jps binary file");
     let parsing_config = BytesConfig::new(file_contents_as_bytes);
     let parsed_binary_info = rust_strings::strings(&parsing_config).expect("Cannot parse jps binary");
