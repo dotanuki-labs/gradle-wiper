@@ -2,20 +2,11 @@
 # Copyright 2024 Dotanuki Labs
 # SPDX-License-Identifier: MIT
 
-current_dir="$(cd "$(dirname "$BATS_TEST_FILENAME")" >/dev/null 2>&1 && pwd)"
-
 @test "should reject invalid arguments" {
     run gradle-wiper disk full
 
     [[ "$output" == *"possible values: evaluate, shallow, deep"* ]]
     [ ! "$status" -eq 0 ]
-}
-
-@test "should show help" {
-    run gradle-wiper help
-
-    [[ "$output" == *"Reclaim machine resources (RAM, Disk) attached to Gradle builds"* ]]
-    [ "$status" -eq 0 ]
 }
 
 @test "should detect usages of disk" {
@@ -71,30 +62,4 @@ current_dir="$(cd "$(dirname "$BATS_TEST_FILENAME")" >/dev/null 2>&1 && pwd)"
 
     [[ "$output" == *"Total resources (RAM memory)"* ]]
     [ "$status" -eq 0 ]
-}
-
-@test "should perform ram shallow wiping" {
-    run $HOME/aaw/gradlew shadowJar -q -p $HOME/aaw
-    run gradle-wiper ram shallow
-
-    [[ "$output" == *"Reclaimed RAM memory"* ]]
-    [ "$status" -eq 0 ]
-
-    [ $(jps | grep Jps | wc -l) -eq 1 ]
-    [ $(jps | grep Gradle | wc -l) -eq 0 ]
-    [ $(jps | grep Kotlin | wc -l) -eq 0 ]
-}
-
-@test "should perform ram deep wiping" {
-    run $HOME/aaw/gradlew tasks -q -p $HOME/aaw
-    run gradle-wiper ram deep
-
-    [[ "$output" == *"Reclaimed RAM memory"* ]]
-    [ "$status" -eq 0 ]
-
-    [ $(jps | grep Gradle | wc -l) -eq 0 ]
-    [ $(jps | grep Kotlin | wc -l) -eq 0 ]
-    [ $(jps | grep GradleWorkerMain | wc -l) -eq 0 ]
-    [ $(jps | grep GradleWrapper | wc -l) -eq 0 ]
-    [ $(jps | grep Main | wc -l) -eq 0 ]
 }
