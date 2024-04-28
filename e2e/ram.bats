@@ -10,7 +10,7 @@
 }
 
 @test "should detect usages of ram" {
-    run $HOME/aaw/gradlew tasks -q -p $HOME/aaw
+    run $HOME/IdeaProjects/aaw/gradlew tasks -q -p $HOME/IdeaProjects//aaw
     run gradle-wiper ram evaluate
 
     [[ "$output" == *"Total resources (RAM memory)"* ]]
@@ -18,7 +18,7 @@
 }
 
 @test "should perform ram shallow wiping" {
-    run $HOME/aaw/gradlew shadowJar -q -p $HOME/aaw
+    run $HOME/IdeaProjects/aaw/gradlew shadowJar -q -p $HOME/IdeaProjects/aaw
     run gradle-wiper ram shallow
 
     [[ "$output" == *"Reclaimed RAM memory"* ]]
@@ -30,7 +30,7 @@
 }
 
 @test "should perform ram deep wiping" {
-    run $HOME/aaw/gradlew tasks -q -p $HOME/aaw
+    run $HOME/IdeaProjects/aaw/gradlew tasks -q -p $HOME/IdeaProjects/aaw
     run gradle-wiper ram deep
 
     [[ "$output" == *"Reclaimed RAM memory"* ]]

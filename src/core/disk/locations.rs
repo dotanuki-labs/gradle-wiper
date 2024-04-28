@@ -25,27 +25,26 @@ pub fn find_all_gradle_projects(user_home: PathBuf) -> Vec<PathBuf> {
     WalkDir::new(user_home)
         .into_iter()
         .filter_map(|entry| entry.ok())
+        .filter(standard_project_locations)
         .filter(ensure_gradle_project)
         .map(|entry| entry.into_path())
         .collect::<Vec<_>>()
 }
 
-pub fn find_associated_filepaths(user_home: PathBuf, cached: DiskCached) -> Vec<PathBuf> {
+pub fn find_associated_filepaths(user_home: &Path, cached: DiskCached) -> Vec<PathBuf> {
     match cached {
         DiskCached::Standalone(project_level) => {
-            let gradle_projects = find_all_gradle_projects(user_home);
+            let gradle_projects = find_all_gradle_projects(user_home.to_path_buf());
 
             if gradle_projects.is_empty() {
                 return gradle_projects;
             };
 
-            let target = match project_level {
-                ProjectLevelDiskCache::BuildOutput => "build",
-                ProjectLevelDiskCache::GradleMetadata => ".gradle",
-                ProjectLevelDiskCache::IdeaMetadata => ".idea",
-            };
-
-            gradle_projects.iter().map(|path| path.join(target)).collect::<Vec<_>>()
+            match project_level {
+                ProjectLevelDiskCache::BuildOutput => all_build_output_folders(&gradle_projects),
+                ProjectLevelDiskCache::GradleMetadata => all_metadata_files(&gradle_projects, ".gradle"),
+                ProjectLevelDiskCache::IdeaMetadata => all_metadata_files(&gradle_projects, ".idea"),
+            }
         },
         DiskCached::Shared(user_level) => match user_level.path_relative_to_user_home() {
             None => vec![],
@@ -55,6 +54,33 @@ pub fn find_associated_filepaths(user_home: PathBuf, cached: DiskCached) -> Vec<
             },
         },
     }
+}
+
+fn standard_project_locations(entry: &DirEntry) -> bool {
+    let entry_path = entry.path();
+    let entry_path_raw = entry_path.to_str().expect("Not a valid path");
+
+    entry_path_raw.contains("AndroidStudioProjects")
+        || entry_path_raw.contains("IdeaProjects")
+        || entry_path_raw.contains("Projects")
+        || entry_path_raw.contains("Dev")
+}
+
+fn all_metadata_files(projects: &[PathBuf], target: &str) -> Vec<PathBuf> {
+    projects.iter().map(|path| path.join(target)).collect::<Vec<_>>()
+}
+
+fn all_build_output_folders(projects: &[PathBuf]) -> Vec<PathBuf> {
+    projects.iter().flat_map(find_build_output_dirs).collect::<Vec<_>>()
+}
+
+fn find_build_output_dirs(project: &PathBuf) -> Vec<PathBuf> {
+    WalkDir::new(project)
+        .into_iter()
+        .filter_map(|entry| entry.ok())
+        .filter(|entry| entry.path().ends_with("build"))
+        .map(|entry| entry.into_path())
+        .collect::<Vec<_>>()
 }
 
 fn ensure_gradle_project(entry: &DirEntry) -> bool {
@@ -133,8 +159,8 @@ mod tests {
             fs::write(&temp_dir.path().join(file), "foo").expect("Cant create fixture file");
         }
 
-        let fake_user_home = temp_dir.path().to_path_buf();
-        let projects = find_all_gradle_projects(fake_user_home.clone());
+        let fake_user_home = temp_dir.path();
+        let projects = find_all_gradle_projects(fake_user_home.to_path_buf());
 
         let expected = ["IdeaProjects/jvm-app", "AndroidStudioProjects/android-app"]
             .into_iter()
