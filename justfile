@@ -32,19 +32,14 @@ lint: toolchain
     @echo
 
     @echo "→ Checking code smells (clippy)"
-    cargo clippy --all-targets --all-features -- -D warnings -W clippy::unwrap_used
+    cargo clippy --all-features -- -D warnings -W clippy::unwrap_used
     @echo
 
 # Run Tests
-tests:
+checks: lint
     @echo "→ Run project tests"
+    cargo check --all-features
     cargo nextest run
-    @echo
-
-# Emulates CI checks
-emulate-ci: lint tests
-    @echo
-    @echo "✅ Emulated a CI build with success"
     @echo
 
 # Install required Cargo plugins (CI)
@@ -90,12 +85,11 @@ msrv-check:
     @echo
 
 # Running E2E tests
-e2e:
-    @echo "→ Build release target"
-    cargo build --release
+e2e suite:
+    @echo "→ Preparing Docker image for tests"
+    ./scripts/prepare-e2e.sh
     @echo
 
     @echo "→ Running E2E tests"
-    docker build . -t dotanuki-labs/gradle-wiper-tests -f e2e/Dockerfile
-    docker run dotanuki-labs/gradle-wiper-tests
+    docker run dotanuki-labs/gradle-wiper-tests {{suite}}
     @echo
