@@ -29,6 +29,7 @@ log = "0.4.21"
 whoami = "1.5.1"
 rust-strings = "0.6.0"
 sysinfo = "0.30.11"
+pariter = "0.5.1"
 
 [dev-dependencies]
 fake = "2.9.2"

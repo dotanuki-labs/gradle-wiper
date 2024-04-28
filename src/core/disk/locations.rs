@@ -5,6 +5,7 @@ use crate::core::disk::user_home_locator;
 use crate::core::models::{DiskCached, ProjectLevelDiskCache};
 use cached::proc_macro::cached;
 use log::debug;
+use pariter::IteratorExt;
 use std::path::{Path, PathBuf};
 use walkdir::{DirEntry, WalkDir};
 
@@ -24,8 +25,9 @@ pub fn find_konan_caches(user_home: &Path) -> PathBuf {
 pub fn find_all_gradle_projects(user_home: PathBuf) -> Vec<PathBuf> {
     WalkDir::new(user_home)
         .into_iter()
-        .filter_map(|entry| entry.ok())
-        .filter(ensure_gradle_project)
+        .parallel_filter(|entry| entry.is_ok())
+        .map(|entry| entry.expect("Expecting OK variant for entry"))
+        .parallel_filter(ensure_gradle_project)
         .map(|entry| entry.into_path())
         .collect::<Vec<_>>()
 }

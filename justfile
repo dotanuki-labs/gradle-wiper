@@ -91,5 +91,5 @@ e2e suite:
     @echo
 
     @echo "→ Running E2E tests"
-    docker run dotanuki-labs/gradle-wiper-tests {{suite}}
+    docker run --cpus="2" dotanuki-labs/gradle-wiper-tests {{suite}}
     @echo
