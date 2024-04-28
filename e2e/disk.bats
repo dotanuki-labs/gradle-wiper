@@ -55,11 +55,3 @@
     [ ! -d $HOME/aaw/build ]
     [ ! -d $HOME/aaw/.gradle ]
 }
-
-@test "should detect usages of ram" {
-    run $HOME/aaw/gradlew tasks -q -p $HOME/aaw
-    run gradle-wiper ram evaluate
-
-    [[ "$output" == *"Total resources (RAM memory)"* ]]
-    [ "$status" -eq 0 ]
-}
