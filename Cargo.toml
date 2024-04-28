@@ -9,7 +9,6 @@ readme = "README.md"
 license = "MIT"
 publish = true
 categories = ["command-line-utilities"]
-keywords = ["utilities", "gradle", "clean-up", "android"]
 
 [package.metadata]
 msrv = "1.74.0"
