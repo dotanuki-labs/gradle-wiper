@@ -14,7 +14,7 @@ categories = ["command-line-utilities"]
 msrv = "1.74.0"
 
 [dependencies]
-anyhow = "1.0.81"
+anyhow = "1.0.82"
 clap = { version = "4.5.4", features = ["derive"] }
 comfy-table = "7.1.0"
 directories = "5.0.1"
