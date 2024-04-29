@@ -162,7 +162,7 @@ mod tests {
         ];
 
         for folder in folders {
-            fs::create_dir(dir.path().join(folder)).expect("Cant create temporary fixture folder");
+            fs::create_dir_all(dir.path().join(folder)).expect("Cant create temporary fixture folder");
         }
 
         let files = vec![
