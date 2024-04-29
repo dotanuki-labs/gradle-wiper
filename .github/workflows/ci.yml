@@ -33,7 +33,10 @@ jobs:
       - name: Setup CI
         uses: ./.github/actions/setup-rust
 
-      - name: Check project for errors
+      - name: Lint project
+        run: just lint
+
+      - name: Check errors and run tests
         run: just checks
 
   e2e:
