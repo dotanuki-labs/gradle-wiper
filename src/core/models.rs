@@ -207,7 +207,6 @@ pub struct WipingOutcome {
     pub reclaimed: ByteUnit,
 }
 
-#[allow(dead_code)]
 impl WipingOutcome {
     pub fn new(subject: MachineResource, reclaimed: ByteUnit) -> Self {
         Self { subject, reclaimed }
@@ -225,7 +224,6 @@ impl EvaluationOutcome {
     }
 }
 
-#[allow(dead_code)]
 pub enum ExecutionOutcome {
     Evaluation(EvaluationOutcome),
     Wiping(WipingOutcome),

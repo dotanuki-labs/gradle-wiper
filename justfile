@@ -35,8 +35,8 @@ lint: toolchain
     cargo clippy --all-features -- -D warnings -W clippy::unwrap_used
     @echo
 
-# Run Tests
-checks: lint
+# Run project tests and check for errors
+checks:
     @echo "→ Run project tests"
     cargo check --all-features
     cargo nextest run
