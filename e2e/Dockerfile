@@ -3,15 +3,14 @@
 
 FROM azul/zulu-openjdk:21-latest@sha256:ce556033434204747103eba4000fe98b97d857cb31072016ea8670bcd8c41331
 
-RUN apt-get update && apt-get install -y git openssh-client bats
-RUN cd $HOME && mkdir -p $HOME/.ssh
-RUN mkdir $HOME/IdeaProjects
-RUN ssh-keyscan -t rsa github.com >> $HOME/.ssh/known_hosts
-RUN git clone https://github.com/dotanuki-labs/android-archives-watchdog.git $HOME/IdeaProjects/aaw
+RUN apt-get update && apt-get install -y git openssh-client bats --no-install-recommends
 
-COPY e2e/disk.bats /usr/disk.bats
-COPY e2e/ram.bats /usr/ram.bats
-COPY e2e/run-tests.sh /usr/run-tests.sh
+RUN mkdir -p "$HOME/.ssh" &&\
+    mkdir "$HOME/IdeaProjects" && \
+    ssh-keyscan -t rsa github.com >> "$HOME/.ssh/known_hosts" && \
+    git clone https://github.com/dotanuki-labs/android-archives-watchdog.git "$HOME/IdeaProjects/aaw"
+
+COPY e2e/ /usr
 COPY target/e2e/gradle-wiper /usr/bin/gradle-wiper
 RUN chmod +x /usr/bin/gradle-wiper
 
