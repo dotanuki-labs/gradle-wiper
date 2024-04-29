@@ -39,6 +39,9 @@ jobs:
       - name: Setup CI
         uses: ./.github/actions/setup-rust
 
+      - name: Publish on crates.io
+        run: cargo publish --token ${{ secrets.CRATESIO_PUBLISH_TOKEN }}
+
       - name: Check supply-chain issues
         run: just supply-chain-checks
 
@@ -62,6 +65,3 @@ jobs:
           files: |
             artifacts/**/*
             gradle-wiper.cdx.json
-
-      - name: Publish on crates.io
-        run: cargo publish --token ${{ secrets.CRATESIO_PUBLISH_TOKEN }}
