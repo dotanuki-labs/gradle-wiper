@@ -18,7 +18,7 @@ anyhow = "1.0.82"
 clap = { version = "4.5.4", features = ["derive"] }
 comfy-table = "7.1.0"
 directories = "5.0.1"
-human-panic = "1.2.3"
+human-panic = "2.0.0"
 itertools = "0.12.1"
 walkdir = "2.5.0"
 uuid = { version = "1.7.0", features = ["v4"] }
