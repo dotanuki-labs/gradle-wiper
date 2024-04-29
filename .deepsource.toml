@@ -1,0 +1,13 @@
+version = 1
+
+[[analyzers]]
+name = "rust"
+enabled = true
+
+[analyzers.meta]
+msrv = "1.74"
+cyclomatic_complexity_threshold = "low"
+
+[[analyzers]]
+name = "shell"
+enabled = true
