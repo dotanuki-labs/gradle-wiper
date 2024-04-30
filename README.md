@@ -24,23 +24,72 @@ system.
 
 ## Installing
 
-Installing from [crates.io](https://crates.io/crates/gradle-wiper)
+> [!NOTE]
+> This tool is compatible with `macOS` and `Linux` boxes, running over `x86_64` or `aarch64` hardware
+
+Installing from [crates.io](https://crates.io/crates/gradle-wiper) (requires [Rust](https://rustup.rs/))
 
 ```bash
 cargo install gradle-wiper
+```
+
+Installing with [homebrew](https://brew.sh/) (macOS/Linux)
+
+```bash
+brew tap dotanuki-labs/taps
+brew install gradle-wiper
 ```
 
 More installation methods to come! Stay tuned! 🔥
 
 ## Using
 
-> [!NOTE]
-> This tool does not uninstall any existing software from your system, and
-> it also preserves custom configuration hosted at `$HOME/.gradle`, like
-> `$HOME/.gradle/gradle.properties` file and `$HOME/.gradle/init.d` build scripts
+The general way to use this tool is
 
-`gradle-wiper` provides a small command-line interface, allowing
-`shallow` and `deep` cleaning modes.
+```bash
+gradle-wiper <resource> <action> (-v | --verbose)
+```
+
+where:
+
+- resource: `disk` or `ram`
+- action: `evaluate` (dry-run), `shallow` (wipe) or `deep` (wipe)
+
+For instance, to evaluate used disk space related to previous Gradle builds:
+
+```bash
+gradle-wiper disk evaluate
+```
+
+You should see something like:
+
+```text
+╭───────────────────────────────┬────────────╮
+│ What                          ┆ Total Size │
+╞═══════════════════════════════╪════════════╡
+│ Gradle Build Caches           ┆ 4.41GiB    │
+├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ Gradle Daemon Logs            ┆ 343.67MiB  │
+├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ Gradle JDK toolchains         ┆ 307.02MiB  │
+├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ Gradle Distributions          ┆ 556.21MiB  │
+├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ Gradle Temporary Files        ┆ 124.47MiB  │
+├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ Gradle platform-native caches ┆ 2.09MiB    │
+├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ Gradle build-scans data       ┆ 3.53MiB    │
+├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ Maven local repository        ┆ 536.22MiB  │
+├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ Konan/KMP Caches             ┆ 0B         │
+├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
+│ Build output files             ┆ 1.01GiB    │
+╰───────────────────────────────┴────────────╯
+
+Total resources (disk space) : 7.2GiB
+```
 
 To wipe out all build-related Daemons (Gradle Workers, Kotin compiler, etc.)
 from you RAM memory:
@@ -71,6 +120,11 @@ along with
 ```bash
 gradle-wiper disk shallow
 ```
+
+> [!NOTE]
+> This tool does not uninstall any existing software from your system, and
+> it also preserves custom configuration hosted at `$HOME/.gradle`, like
+> `$HOME/.gradle/gradle.properties` file and `$HOME/.gradle/init.d` build scripts
 
 To also scan your disk for Gradle/IDE metadata files per project, removing
 
