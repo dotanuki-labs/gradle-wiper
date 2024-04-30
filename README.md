@@ -83,9 +83,9 @@ You should see something like:
 ├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
 │ Maven local repository        ┆ 536.22MiB  │
 ├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
-│ Konan/KMP Caches             ┆ 0B         │
+│ Konan/KMP Caches              ┆ 0B         │
 ├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┼╌╌╌╌╌╌╌╌╌╌╌╌┤
-│ Build output files             ┆ 1.01GiB    │
+│ Build output files            ┆ 1.01GiB    │
 ╰───────────────────────────────┴────────────╯
 
 Total resources (disk space) : 7.2GiB
