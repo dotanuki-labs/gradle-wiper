@@ -17,7 +17,6 @@ pub fn find_resources_used_by_jvm(
     let resources = jvm_processes
         .into_iter()
         .filter_map(|(pid, class_name)| resources_converter(pid, class_name))
-        .sorted_by_key(|item| item.0)
         .map(|(cached, memory)| (UseCase::from(cached), memory))
         .sorted_by_key(|item| item.0)
         .group_by(|item| item.0)
