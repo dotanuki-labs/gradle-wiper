@@ -36,8 +36,8 @@ jobs:
       - name: Lint project
         run: just lint
 
-      - name: Check errors and run tests
-        run: just checks
+      - name: Run tests
+        run: just tests
 
   e2e:
     runs-on: ubuntu-22.04
@@ -70,8 +70,11 @@ jobs:
       - name: Setup CI
         uses: ./.github/actions/setup-rust
 
+      - name: Check MSRV
+        run: just msrv
+
       - name: Cross-compilation against some targets
-        run: just flexible-build
+        run: just assemble
 
       - name: Archive binaries
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
@@ -90,11 +93,8 @@ jobs:
       - name: Setup CI
         uses: ./.github/actions/setup-rust
 
-      - name: Check MSRV
-        run: just msrv-check
-
       - name: Check supply-chain issues
-        run: just supply-chain-checks
+        run: just security
 
       - name: Archive SBOM
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3

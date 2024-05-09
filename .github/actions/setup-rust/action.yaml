@@ -26,4 +26,4 @@ runs:
 
         - name: Setup Rust and Cargo plugins
           shell: bash
-          run: just setup-ci
+          run: just setup

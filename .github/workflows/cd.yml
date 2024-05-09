@@ -19,8 +19,8 @@ jobs:
       - name: Setup CI
         uses: ./.github/actions/setup-rust
 
-      - name: Cross-compilation against targets
-        run: just flexible-build
+      - name: Cross-compilation supported targets
+        run: just assemble
 
       - name: Archive binaries
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
@@ -43,7 +43,7 @@ jobs:
         run: cargo publish --token ${{ secrets.CRATESIO_PUBLISH_TOKEN }}
 
       - name: Check supply-chain issues
-        run: just supply-chain-checks
+        run: just security
 
       - name: Fetch executable from previous build
         uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7

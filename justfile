@@ -1,32 +1,36 @@
-# General tasks driven by Just
-# https://github.com/casey/just
+# General SDLC tasks driven by Just
+# https://just.systems
 
-# Install and activate Rust toolchain
-toolchain:
-    @echo "→ Install and activate Rust toolchain"
+_default:
+  @just --list --unsorted
+
+# Performs setup for this project
+setup:
+    @echo "→ Installing and activating Rust toolchain"
     rustup show active-toolchain
     @echo
-
-# Install Cargo plugins (local)
-cargo-plugins-local:
     @echo "→ Installing Cargo Binstall"
     ./scripts/cargo-binstaller.sh
     @echo
-
-    @echo "→ Installing Cargo plugins (local)"
-    yes | cargo binstall cargo-nextest --secure --force
-    yes | cargo binstall cargo-get --secure --force
-    yes | cargo binstall cargo-msrv --secure --force
+    @echo "→ Installing Cargo plugins (CI)"
+    cargo binstall cargo-deny -y --quiet --force
+    cargo binstall cargo-cyclonedx -y --quiet --force
+    cargo binstall cargo-nextest -y --quiet --force
+    cargo binstall cargo-get -y --quiet --force
+    cargo binstall cargo-msrv -y --quiet --force
+    cargo binstall cargo-zigbuild -y --quiet --force
+    @echo
+    @echo "✅ Setup concluded"
     @echo
 
-# Performs setup for this project (local)
-setup-local: toolchain cargo-plugins-local
-    @echo
-    @echo "✅ Setup (local) concluded"
+# Checks minimum supported Rust toolchain version
+msrv:
+    @echo "→ Checking minimum supported Rust toolchain version (MSRV)"
+    cargo msrv verify
     @echo
 
-# Check code formatting and smells
-lint: toolchain
+# Checks code formatting and smells
+lint:
     @echo "→ Checking code formatting (rustfmt)"
     cargo fmt --check
     @echo
@@ -35,41 +39,26 @@ lint: toolchain
     cargo clippy --all-features -- -D warnings -W clippy::unwrap_used
     @echo
 
-# Run project tests and check for errors
-checks:
-    @echo "→ Run project tests"
+# Checks compilation errors
+compile:
+    @echo "→ Checking for compilation errors"
     cargo check --all-features
+    @echo
+
+# Runs unit/module tests
+tests:
+    @echo "→ Running unit/module tests"
     cargo nextest run
     @echo
 
-# Install required Cargo plugins (CI)
-cargo-plugins-ci:
-    @echo "→ Installing Cargo Binstall"
-    ./scripts/cargo-binstaller.sh
-    @echo
-
-    @echo "→ Installing Cargo plugins (CI)"
-    yes | cargo binstall cargo-deny --secure --force
-    yes | cargo binstall cargo-cyclonedx --secure --force
-    yes | cargo binstall cargo-nextest --secure --force
-    yes | cargo binstall cargo-get --secure --force
-    yes | cargo binstall cargo-msrv --secure --force
-    yes | cargo binstall cargo-zigbuild --secure --force
-    @echo
-
-# Performs setup for this project (CI)
-setup-ci: toolchain cargo-plugins-ci
-    @echo "✅ Setup (CI) concluded"
-    @echo
-
-# Build project according to local or CI environment
-flexible-build:
-    @echo "→ Build project according to local or CI environment"
+# Builds binaries according to local or CI environment
+assemble:
+    @echo "→ Building project according to local or CI environment"
     ./scripts/flex-build.sh
     @echo
 
-# Generates supply-chain related artifacts
-supply-chain-checks:
+# Runs supply-chain checks and generates SecOps artifacts
+security:
     @echo "→ Checking supplying chain"
     cargo deny check
     @echo
@@ -78,13 +67,7 @@ supply-chain-checks:
     cargo cyclonedx --format json
     @echo
 
-# Check MSRV
-msrv-check:
-    @echo "→ Checking minimum supported Rust version (MSRV)"
-    cargo msrv verify
-    @echo
-
-# Running E2E tests
+# Runs E2E/Component tests, where suite is 'ram' or 'disk'
 e2e suite:
     @echo "→ Preparing Docker image for tests"
     ./scripts/prepare-e2e.sh
