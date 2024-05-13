@@ -13,12 +13,7 @@ setup:
     ./scripts/cargo-binstaller.sh
     @echo
     @echo "→ Installing Cargo plugins (CI)"
-    cargo binstall cargo-deny -y --quiet --force
-    cargo binstall cargo-cyclonedx -y --quiet --force
-    cargo binstall cargo-nextest -y --quiet --force
-    cargo binstall cargo-get -y --quiet --force
-    cargo binstall cargo-msrv -y --quiet --force
-    cargo binstall cargo-zigbuild -y --quiet --force
+    ./scripts/cargo-plugins.sh
     @echo
     @echo "✅ Setup concluded"
     @echo
