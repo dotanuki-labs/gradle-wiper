@@ -5,26 +5,32 @@
 > [!NOTE]
 > We officially support development over `macOS` and `Linux` boxes for now.
 
-This project is written in Rust, and it assumes a valid Rust installation on your local machine.
-We definitely recommend [rustup](https://rustup.rs/) to get this sorted.
+This project is written in Rust, and explicitly depends on:
 
-In addition to that, we also require too additional software components on your system:
+- [rustup](https://rustup.rs/)
+- [asdf-vm](https://asdf-vm.com/)
+- [docker](https://www.docker.com/)
+
+Please ensure you have those installed on your system.
 
 - [just](https://just.systems), used as a task runner
 - [ziglang](https://ziglang.org/), used as a linker for cross-compilation
 
-You can install those with your package manager of choice, for instance running:
-
-```bash
-brew install just zig
-```
-
-In addition to that, this project also requires [Docker](https://www.docker.com/).
-On macOS boxes, you can get that with `Docker Desktop`, `OrbStack` or similar tools.
-
 ## Project setup
 
-As mentioned before, this project uses [just](https://just.systems) as a task runner and
+To get started, install additional required tools with `asdf`:
+
+```bash
+./scripts/install-requirements.sh
+```
+
+which will install
+[just](https://just.systems)
+and
+[ziglang](https://ziglang.org)
+for your user.
+
+This project uses `just` as a task runner and
 defines a few recipes to make things straightforward. You can check them by running:
 
 ```bash

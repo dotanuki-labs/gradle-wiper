@@ -12,17 +12,17 @@ runs:
           with:
               save-if: ${{ github.ref == 'refs/heads/main' }}
 
-        - name: Install additional tools (Mac)
+        - name: Install asdf
+          uses: asdf-vm/actions/setup@05e0d2ed97b598bfce82fd30daf324ae0c4570e6 # v3.0.2
+
+        - name: Install local required tools
+          shell: bash
+          run: ./scripts/install-requirements.sh
+
+        - name: Install additional tools (Mac-only)
           if: runner.os == 'macOS'
           shell: bash
-          run: brew install just coreutils zig
-
-        - name: Install additional tools (Linux)
-          if: runner.os == 'Linux'
-          shell: bash
-          run: |
-              sudo snap install --edge --classic just
-              sudo snap install zig --classic --beta && zig version
+          run: brew install coreutils
 
         - name: Setup Rust and Cargo plugins
           shell: bash
