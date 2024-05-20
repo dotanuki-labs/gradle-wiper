@@ -19,7 +19,7 @@ pub fn find_resources_used_by_jvm(
         .filter_map(|(pid, class_name)| resources_converter(pid, class_name))
         .map(|(cached, memory)| (UseCase::from(cached), memory))
         .sorted_by_key(|item| item.0)
-        .group_by(|item| item.0)
+        .chunk_by(|item| item.0)
         .into_iter()
         .map(|(use_case, group)| {
             (
