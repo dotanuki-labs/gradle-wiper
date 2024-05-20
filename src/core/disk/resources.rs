@@ -50,7 +50,7 @@ pub fn resources_used_by_gradle_home(gradle_home: &Path) -> anyhow::Result<Vec<A
         .filter(ensure_file)
         .map(|entry| (size_for_entry(&entry), evaluate_use_case_from_gradle_home(&entry)))
         .filter(|item| item.1 != UseCase::from(UserLevelDiskCache::GradleOtherCaches))
-        .group_by(|item| item.1)
+        .chunk_by(|item| item.1)
         .into_iter()
         .map(|(use_case, group)| (use_case, group.fold(0, |total, (entry_size, _)| total + entry_size)))
         .map(|(use_case, total)| AllocatedResource::new(use_case, ByteUnit::from(total)))
