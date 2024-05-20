@@ -10,25 +10,34 @@ on:
       - main
 
 jobs:
-  essential-checks:
+  docs:
     runs-on: ubuntu-22.04
     steps:
       - name: Project Checkout
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
-      - name: Run essential checks
-        uses: dotanuki-labs/github-actions/essentials@main
+      - name: Check typos on source files
+        uses: dotanuki-labs/github-actions/quality/typos@main
+
+      - name: Lint Markdown files
+        uses: dotanuki-labs/github-actions/quality/markdown@main
+
+      - name: Check MIT license on source files
+        uses: dotanuki-labs/github-actions/foss/check-licenses@main
         with:
           file-patterns: '*.sh,*.rs,*.yml,*.bats,*Dockerfile'
           license: 'mit'
 
   lint-tests:
     runs-on: ubuntu-22.04
-    needs: essential-checks
+    needs: docs
 
     steps:
       - name: Project Checkout
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+
+      - name: Lint Bash scripts
+        uses: dotanuki-labs/github-actions/quality/bash@main
 
       - name: Setup CI
         uses: ./.github/actions/setup-rust
@@ -41,7 +50,7 @@ jobs:
 
   e2e:
     runs-on: ubuntu-22.04
-    needs: essential-checks
+    needs: docs
     strategy:
       matrix:
         resource: [ 'disk', 'ram' ]
@@ -57,7 +66,7 @@ jobs:
         run: just e2e ${{ matrix.resource }}
 
   build:
-    needs: essential-checks
+    needs: docs
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
