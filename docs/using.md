@@ -1,25 +1,27 @@
-# gradle-wiper
+# Using this tool
 
-[![OpenSSF Best](https://www.bestpractices.dev/projects/8920/badge)](https://www.bestpractices.dev/projects/8920)
-[![DeepSource](https://app.deepsource.com/gh/dotanuki-labs/gradle-wiper.svg/?label=active+issues&token=_GtR-4HW2ttd966CiJOOYEw6)](https://app.deepsource.com/gh/dotanuki-labs/gradle-wiper/)
-[![CI](https://github.com/dotanuki-labs/gradle-wiper/actions/workflows/ci.yml/badge.svg)](https://github.com/dotanuki-labs/gradle-wiper/actions/workflows/ci.yml)
-[![Rust](https://img.shields.io/badge/rustc-1.74+-FF8000.svg?logo=rust&logoColor=white)](https://rustup.rs/)
-[![Crates.io](https://img.shields.io/crates/v/gradle-wiper)](https://crates.io/crates//gradle-wiper)
-[![License](https://img.shields.io/github/license/dotanuki-labs/gradle-wiper)](https://choosealicense.com/licenses/mit)
+## Overview
 
-> Easily reclaim machine resources taken by Gradle builds
+The general way to use this tool is
 
-`gradle-wiper` is a clean-up utility for all users building with the
-[Gradle build tool](https://gradle.org/).
+```bash
+gradle-wiper <resource> <action> (-v | --verbose)
+```
 
-It's a fast, modern, intuitive and ergonomic alternative for existing tools like
-[deep-clean](https://github.com/rock3r/deep-clean),
-[AndroidDaemonKiller](https://github.com/PaulWoitaschek/DaemonHunter)
-and others.
+where:
+
+- resource: `disk` or `ram`
+- action: `evaluate` (dry-run), `shallow` (wipe) or `deep` (wipe)
+
+For instance, to evaluate used disk space related to previous Gradle builds:
 
 ```bash
 gradle-wiper disk evaluate
+```
 
+You should see something like:
+
+```text
 ╭───────────────────────────────┬────────────╮
 │ What                          ┆ Total Size │
 ╞═══════════════════════════════╪════════════╡
@@ -45,20 +47,78 @@ gradle-wiper disk evaluate
 ╰───────────────────────────────┴────────────╯
 
 Total resources (disk space) : 7.2GiB
-
 ```
+
+## Cleaning resources
+
+To wipe out all build-related Daemons (Gradle Workers, Kotin compiler, etc.)
+from you RAM memory:
+
+```bash
+gradle-wiper ram shallow
+```
+
+To wipe out all JVM processes from your RAM memory (including running IDEs):
+
+```bash
+gradle-wiper ram deep
+```
+
+To wipe out potentially corrupted build caches from disk, including:
+
+- `$HOME/.gradle/caches`
+- `$HOME/.gradle/configuration-cache`
+
+along with
+
+- Maven dependency caches (`$HOME/.m2`)
+- Konan dependency caches (`$HOME/.konan`)
+- Logs from Gradle builds (`$HOME/.gradle/daemon`)
+- Gradle temporary files (`$HOME/.gradle/.tmp`)
+- All `build` output folders from any Gradle projects in your system
+
+```bash
+gradle-wiper disk shallow
+```
+
+> [!NOTE]
+> This tool does not uninstall any existing software from your system, and
+> it also preserves custom configuration hosted at `$HOME/.gradle`, like
+> `$HOME/.gradle/gradle.properties` file and `$HOME/.gradle/init.d` build scripts
+
+To also scan your disk for Gradle/IDE metadata files per project, removing
+
+- all `<my-project>/.gradle/*` Gradle files/caches
+- all `<my-project>/.idea/*` IDE metadata files/caches
 
 ```bash
 gradle-wiper disk deep
-
-Reclaimed 7.2Gib
-
 ```
 
-Check out the
-[complete documentation](https://github.com/dotanuki-labs/gradle-wiper/tree/main/docs)
-to learn more!
+## Troubleshooting
 
-## License
+All subcommands accept a `verbose` flag which outputs information about the current
+execution:
 
-Copyright (c) 2024 - Dotanuki Labs - [The MIT license](https://choosealicense.com/licenses/mit)
+```bash
+gradle-wiper disk evaluate --verbose
+```
+
+In addition, you also have the `--help` flag:
+
+```bash
+gradle-wiper --help
+
+Reclaim machine resources (RAM, Disk) attached to Gradle builds
+
+Usage: gradle-wiper <COMMAND>
+
+Commands:
+  disk
+  ram
+  help  Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help     Print help
+  -V, --version  Print version
+```

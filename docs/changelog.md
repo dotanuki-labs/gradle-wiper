@@ -1,21 +1,12 @@
-# CHANGELOG
+# Changelog
 
 We follow the [Keep a Changelog](https://keepachangelog.com)
-conventions for release notes. All notable project changes will be documented here.
+conventions for release notes. Notable product changes are documented here.
+In addition, you can also check all commits that landed in a given release
+directly on
+[Github Releases](https://github.com/dotanuki-labs/gradle-wiper/releases/latest).
 
----
-
-## Next version 0.x.y
-
-Released at **YYYY-MM-DD**
-
-### Added
-
-- To do
-
----
-
-## Version 0.1.0
+## 0.1.0
 
 Released at **2024-04-29**
 

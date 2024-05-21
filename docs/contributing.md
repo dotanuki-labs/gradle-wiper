@@ -1,8 +1,8 @@
 # Contribution Guidelines
 
-## Getting involved
+## Introduction
 
-Before getting started, we can't recommend enough reading the
+Before getting started, we strongly recommend enough reading the
 [contribution guidelines for Dotanuki Labs](https://github.com/dotanuki-labs/.github/blob/main/CONTRIBUTING.md)
 projects.
 
@@ -12,9 +12,7 @@ When looking for something easy to contribute, we can recommend checking
 [good first issues](https://github.com/dotanuki-labs/gradle-wiper/labels/good%20first%20issue)
 in our issue tracker.
 
-## Reporting (issues)
-
-### Reporting bugs
+## Reporting bugs
 
 This project uses that standard
 [recommendations for reporting bugs](https://github.com/dotanuki-labs/.github/blob/main/CONTRIBUTING.md#issues)
@@ -35,7 +33,7 @@ paying especial attention to instructions on how to reproduce it.
 We value a lot bug reports! We'll reply to you up to 24h after a bug is reported. For bugs we
 manage to reproduce, we'll release a new version of this project as soon we have a fix in place!
 
-### Reporting vulnerabilities
+## Reporting vulnerabilities
 
 > [!WARNING]
 >
@@ -45,7 +43,22 @@ This project uses the standard
 [Security Policies for Dotanuki Labs](https://github.com/dotanuki-labs/.github/blob/main/SECURITY.md).
 Please check them out.
 
-## Code Contributions (Pull Requests)
+## Fixing bugs
+
+When fixing an existing bug:
+
+- Describe why your fix works as intended
+- If applicable, ensure you've added a test case covering the fixed bug
+
+## Adding new functionality
+
+When adding a new feature:
+
+- Describe briefly your solution
+- Ensure you've added tests covering use cases for the functionality
+- Consider using inlay Pull Request comments to highlight specific implementation details
+
+## Pull Requests
 
 > [!Note]
 >
@@ -67,22 +80,7 @@ just tests
 - Fill the description with our [pull request template](https://github.com/dotanuki-labs/.github/blob/main/.github/PULL_REQUEST_TEMPLATE.md)
 - Ensure you've your PR [linked with a proper issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword)
 
-### Fixing bugs
-
-When fixing an existing bug:
-
-- Describe why your fix works as intended
-- If applicable, ensure you've added a test case covering the fixed bug
-
-### Adding new functionality
-
-When adding a new feature:
-
-- Describe briefly your solution
-- Ensure you've added tests covering use cases for the functionality
-- Consider using inlay Pull Request comments to highlight specific implementation details
-
-### License
+## License
 
 Please note that all code contributed by you will follow the
 [MIT license](http://opensource.org/licenses/MIT)
