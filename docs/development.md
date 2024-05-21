@@ -2,7 +2,7 @@
 
 ## Requirements
 
-> [!NOTE]
+> [!INFO]
 > We officially support development over `macOS` and `Linux` boxes for now.
 
 This project is written in Rust, and explicitly depends on:
