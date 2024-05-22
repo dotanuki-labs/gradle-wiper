@@ -49,7 +49,7 @@ You should see something like:
 Total resources (disk space) : 7.2GiB
 ```
 
-## Cleaning resources
+## Reclaiming resources
 
 To wipe out all build-related Daemons (Gradle Workers, Kotin compiler, etc.)
 from you RAM memory:

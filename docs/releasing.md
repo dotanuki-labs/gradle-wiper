@@ -21,7 +21,7 @@ git checkout -b ufs/release-x.y.z
 - Bump version at [Cargo.toml](https://github.com/dotanuki-labs/gradle-wiper/blob/main/Cargo.toml#L3)
 - Raise a PR preparing the release
 
-## Creating a release (GitHub admins-only)
+## Creating a release
 
 - Ensure the next release is prepared (as described above)
 - Execute the [CD Workflow](https://github.com/dotanuki-labs/gradle-wiper/actions/workflows/cd.yml)
