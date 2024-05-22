@@ -9,7 +9,7 @@ projects.
 This document augments these recommendations with specifics ones for this project!
 
 When looking for something easy to contribute, we can recommend checking
-[good first issues](https://github.com/dotanuki-labs/gradle-wiper/labels/good%20first%20issue)
+[good first issues](https://github.com/dotanuki-labs/gradle-wiper/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
 in our issue tracker.
 
 ## Reporting bugs

@@ -12,11 +12,6 @@
 `gradle-wiper` is a clean-up utility for all users building with the
 [Gradle build tool](https://gradle.org/).
 
-It's a fast, modern, intuitive and ergonomic alternative for existing tools like
-[deep-clean](https://github.com/rock3r/deep-clean),
-[AndroidDaemonKiller](https://github.com/PaulWoitaschek/DaemonHunter)
-and others.
-
 ```bash
 gradle-wiper disk evaluate
 
@@ -56,7 +51,7 @@ Reclaimed 7.2Gib
 ```
 
 Check out the
-[complete documentation](https://github.com/dotanuki-labs/gradle-wiper/tree/main/docs)
+[complete documentation](https://dotanuki-labs.github.io/gradle-wiper/)
 to learn more!
 
 ## License

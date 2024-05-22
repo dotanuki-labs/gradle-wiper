@@ -16,8 +16,10 @@ situations like:
 - you don't want to restart your machine just to have some RAM memory again
 - etc
 
-`gradle-wiper` is written in 100% safe
+This tool is written in 100% safe
 [Rust](https://www.rust-lang.org/)
-hence it is small, fast and Unix-ready by default.
+hence it is small, fast and portable by default. In addition, it adheres to the
+[best open-source practices](https://www.bestpractices.dev/en/projects/8920)
+proposed by the [Open Source Security Foundation](https://openssf.org/).
 
-`gradle-wiper` is distributed under the terms of [the MIT license](https://choosealicense.com/licenses/mit)
+Last, but not least, this code is distributed under the terms of [the MIT license](https://choosealicense.com/licenses/mit)
