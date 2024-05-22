@@ -1,7 +1,7 @@
 # Copyright 2024 Dotanuki Labs
 # SPDX-License-Identifier: MIT
 
-name: "GHPages"
+name: "Docs"
 
 on:
   push:
@@ -14,7 +14,7 @@ permissions:
   id-token: write
 
 jobs:
-  deploy:
+  ghpages-deploy:
     runs-on: ubuntu-22.04
     environment:
       name: github-pages
