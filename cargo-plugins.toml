@@ -1,5 +1,5 @@
 cargo-deny = "0.14.23"
-cargo-cyclonedx = "0.5.0"
+cargo-cyclonedx = "0.5.1"
 cargo-zigbuild = "0.18.4"
 cargo-nextest = "0.9.70"
 cargo-get = "1.1.1"
