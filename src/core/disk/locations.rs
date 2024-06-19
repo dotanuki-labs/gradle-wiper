@@ -4,6 +4,7 @@
 use crate::core::disk::user_home_locator;
 use crate::core::models::{DiskCached, ProjectLevelDiskCache};
 use cached::proc_macro::cached;
+use itertools::Itertools;
 use log::debug;
 use std::path::{Path, PathBuf};
 use walkdir::{DirEntry, WalkDir};
@@ -28,6 +29,7 @@ pub fn find_all_gradle_projects(user_home: PathBuf) -> Vec<PathBuf> {
         .filter(standard_project_locations)
         .filter(ensure_gradle_project)
         .map(|entry| entry.into_path())
+        .sorted()
         .collect::<Vec<_>>()
 }
 
@@ -117,6 +119,7 @@ fn ensure_gradle_project(entry: &DirEntry) -> bool {
 #[cfg(test)]
 mod tests {
     use crate::core::disk::find_all_gradle_projects;
+    use itertools::Itertools;
     use std::fs;
     use temp_dir::TempDir;
 
@@ -162,9 +165,10 @@ mod tests {
         let fake_user_home = temp_dir.path();
         let projects = find_all_gradle_projects(fake_user_home.to_path_buf());
 
-        let expected = ["IdeaProjects/jvm-app", "AndroidStudioProjects/android-app"]
+        let expected = ["AndroidStudioProjects/android-app", "IdeaProjects/jvm-app"]
             .into_iter()
             .map(|item| fake_user_home.join(item))
+            .sorted()
             .collect::<Vec<_>>();
 
         assert_eq!(projects, expected);
