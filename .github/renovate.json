@@ -90,18 +90,6 @@
         },
         {
             "customType": "regex",
-            "depNameTemplate": "cargo-zigbuild",
-            "packageNameTemplate": "rust-cross/cargo-zigbuild",
-            "datasourceTemplate": "github-releases",
-            "fileMatch": [
-                "(^|/)cargo-plugins\\.toml"
-            ],
-            "matchStrings": [
-                "cargo-zigbuild\\s*=\\s*\"(?<currentValue>\\d+\\.\\d+(\\.\\d+)?)\""
-            ]
-        },
-        {
-            "customType": "regex",
             "depNameTemplate": "cargo-get",
             "packageNameTemplate": "nicolaiunrein/cargo-get",
             "datasourceTemplate": "github-releases",

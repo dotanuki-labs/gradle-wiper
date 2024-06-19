@@ -12,7 +12,7 @@ build() {
     local target="$1"
 
     rustup target add "$target"
-    cargo zigbuild --release --target "$target"
+    cargo build --release --target "$target"
 
     local binary="target/$target/release/gradle-wiper"
     cp "$binary" "$output_dir"/gradle-wiper-"$target"
