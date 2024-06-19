@@ -14,7 +14,6 @@ This project is written in Rust, and explicitly depends on:
 Please ensure you have those installed on your system.
 
 - [just](https://just.systems), used as a task runner
-- [ziglang](https://ziglang.org/), used as a linker for cross-compilation
 
 ## Project setup
 
@@ -26,8 +25,6 @@ To get started, install additional required tools with `asdf`:
 
 which will install
 [just](https://just.systems)
-and
-[ziglang](https://ziglang.org)
 for your user.
 
 This project uses `just` as a task runner and

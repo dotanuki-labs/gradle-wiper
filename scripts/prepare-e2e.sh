@@ -18,7 +18,7 @@ build_and_copy_release_binary() {
     local target=$1
     echo "→ Building target : $target"
 
-    cargo zigbuild --release --target "$target"
+    cargo build --release --target "$target"
     local binary="target/$target/release/gradle-wiper"
     cp "$binary" "$e2e_bin_home"/gradle-wiper
 }
