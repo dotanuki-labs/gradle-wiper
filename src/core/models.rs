@@ -203,13 +203,12 @@ impl AllocatedResource {
 }
 
 pub struct WipingOutcome {
-    pub subject: MachineResource,
     pub reclaimed: ByteUnit,
 }
 
 impl WipingOutcome {
-    pub fn new(subject: MachineResource, reclaimed: ByteUnit) -> Self {
-        Self { subject, reclaimed }
+    pub fn new(reclaimed: ByteUnit) -> Self {
+        Self { reclaimed }
     }
 }
 

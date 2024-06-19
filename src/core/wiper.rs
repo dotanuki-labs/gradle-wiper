@@ -60,7 +60,7 @@ fn wipe_ram(caches_to_remove: Vec<MemoryCached>) -> anyhow::Result<ExecutionOutc
 
     let reclaimed = total_memory_before - total_memory_after;
 
-    let outcome = WipingOutcome::new(RamMemory, reclaimed);
+    let outcome = WipingOutcome::new(reclaimed);
     Ok(ExecutionOutcome::Wiping(outcome))
 }
 
@@ -163,7 +163,7 @@ fn wipe_disk(caches_to_remove: Vec<DiskCached>) -> anyhow::Result<ExecutionOutco
     let after_cleaning = evaluate_disk_space()?;
     let after_cleaning_evaluation = after_cleaning.as_evaluation();
     let reclaimed = before_cleaning_evaluation.total_size - after_cleaning_evaluation.total_size;
-    let outcome = WipingOutcome::new(DiskSpace, reclaimed);
+    let outcome = WipingOutcome::new(reclaimed);
 
     Ok(ExecutionOutcome::Wiping(outcome))
 }
