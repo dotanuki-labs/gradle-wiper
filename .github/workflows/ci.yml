@@ -89,7 +89,7 @@ jobs:
         run: just assemble
 
       - name: Archive binaries
-        uses: actions/upload-artifact@89ef406dd8d7e03cfd12d9e0a4a378f454709029 # v4.3.5
+        uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
         with:
             name: gradle-wiper-binaries-${{ runner.os }}
             path: target/ci
@@ -109,7 +109,7 @@ jobs:
         run: just security
 
       - name: Archive SBOM
-        uses: actions/upload-artifact@89ef406dd8d7e03cfd12d9e0a4a378f454709029 # v4.3.5
+        uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
         with:
           name: sbom-${{ github.sha }}.json
           path: gradle-wiper.cdx.json
