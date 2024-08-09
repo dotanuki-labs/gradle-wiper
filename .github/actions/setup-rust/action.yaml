@@ -12,13 +12,6 @@ runs:
           with:
               save-if: ${{ github.ref == 'refs/heads/main' }}
 
-        - name: Install asdf
-          uses: asdf-vm/actions/setup@05e0d2ed97b598bfce82fd30daf324ae0c4570e6 # v3.0.2
-
-        - name: Install local required tools
-          shell: bash
-          run: ./scripts/install-requirements.sh
-
         - name: Install additional tools (Mac-only)
           if: runner.os == 'macOS'
           shell: bash
@@ -31,4 +24,4 @@ runs:
 
         - name: Setup Rust and Cargo plugins
           shell: bash
-          run: just setup
+          run: ./krabby.sh setup

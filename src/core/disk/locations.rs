@@ -144,7 +144,7 @@ mod tests {
         ];
 
         for folder in folders {
-            fs::create_dir(&temp_dir.path().join(folder)).expect("Cant create temporary fixture folder");
+            fs::create_dir(temp_dir.path().join(folder)).expect("Cant create temporary fixture folder");
         }
 
         let files = [
@@ -159,7 +159,7 @@ mod tests {
         ];
 
         for file in files {
-            fs::write(&temp_dir.path().join(file), "foo").expect("Cant create fixture file");
+            fs::write(temp_dir.path().join(file), "foo").expect("Cant create fixture file");
         }
 
         let fake_user_home = temp_dir.path();

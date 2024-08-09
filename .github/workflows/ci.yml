@@ -31,7 +31,7 @@ jobs:
       - name: Build documentation assets
         uses: dotanuki-labs/github-actions/foss/prepare-ghpages@main
 
-  lint-tests:
+  lint:
     runs-on: ubuntu-22.04
     needs: check-docs
 
@@ -42,14 +42,22 @@ jobs:
       - name: Lint Bash scripts
         uses: dotanuki-labs/github-actions/quality/bash@main
 
+      - name: Lint project
+        run: ./krabby.sh lint
+
+  tests:
+    runs-on: ubuntu-22.04
+    needs: check-docs
+
+    steps:
+      - name: Project Checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
       - name: Setup CI
         uses: ./.github/actions/setup-rust
 
-      - name: Lint project
-        run: just lint
-
       - name: Run tests
-        run: just tests
+        run: ./krabby.sh tests
 
   e2e:
     runs-on: ubuntu-22.04
@@ -66,7 +74,7 @@ jobs:
         uses: ./.github/actions/setup-rust
 
       - name: Cross-compilation against some targets
-        run: just e2e ${{ matrix.resource }}
+        run: ./krabby.sh e2e ${{ matrix.resource }}
 
   build:
     needs: check-docs
@@ -82,21 +90,18 @@ jobs:
       - name: Setup CI
         uses: ./.github/actions/setup-rust
 
-      - name: Check MSRV
-        run: just msrv
-
-      - name: Cross-compilation against some targets
-        run: just assemble
+      - name: Run tests
+        run: ./krabby.sh assemble
 
       - name: Archive binaries
         uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
         with:
             name: gradle-wiper-binaries-${{ runner.os }}
-            path: target/ci
+            path: artifacts
 
   security-checks:
     runs-on: ubuntu-22.04
-    needs: [build, lint-tests, e2e]
+    needs: [build, lint, tests, e2e]
 
     steps:
       - name: Project Checkout
@@ -105,8 +110,8 @@ jobs:
       - name: Setup CI
         uses: ./.github/actions/setup-rust
 
-      - name: Check supply-chain issues
-        run: just security
+      - name: Run tests
+        run: ./krabby.sh security
 
       - name: Archive SBOM
         uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
