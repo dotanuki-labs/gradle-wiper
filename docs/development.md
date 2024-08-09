@@ -8,47 +8,31 @@
 This project is written in Rust, and explicitly depends on:
 
 - [rustup](https://rustup.rs/)
-- [asdf-vm](https://asdf-vm.com/)
 - [docker](https://www.docker.com/)
 
 Please ensure you have those installed on your system.
 
-- [just](https://just.systems), used as a task runner
-
 ## Project setup
 
-To get started, install additional required tools with `asdf`:
-
-```bash
-./scripts/install-requirements.sh
-```
-
-which will install
-[just](https://just.systems)
-for your user.
-
-This project uses `just` as a task runner and
+This project uses the companion `krabby.sh` as a task runner and
 defines a few recipes to make things straightforward. You can check them by running:
 
 ```bash
-just
+./krabby.sh
 
 Available recipes:
     setup     # Performs setup for this project
-    msrv      # Checks minimum supported Rust toolchain version
     lint      # Checks code formatting and smells
-    compile   # Checks compilation errors
-    tests     # Runs unit/module tests
-    build     # Builds project according to local or CI environment
-    security  # Runs supply-chain checks and generates SecOps artifacts
-    e2e suite # Runs E2E/Component tests, where suite is 'ram' or 'disk'
+    .
+    .
+    .
 ```
 
 We definitely recommend getting started by setting up the latest version of Rust along with
 all required Cargo subcommands by running:
 
 ```bash
-just setup
+./krabby.sh setup
 ```
 
 ## Code Style

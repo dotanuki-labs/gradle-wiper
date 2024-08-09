@@ -31,73 +31,20 @@
             "depNameTemplate": "rust",
             "packageNameTemplate": "rust-lang/rust",
             "datasourceTemplate": "github-releases",
-            "fileMatch": [
-                "(^|/)rust-toolchain\\.toml$"
-            ],
+            "fileMatch": ["(^|/)rust-toolchain\\.toml$"],
             "matchStrings": [
                 "channel\\s*=\\s*\"(?<currentValue>\\d+\\.\\d+(\\.\\d+)?)\""
             ]
         },
         {
             "customType": "regex",
-            "depNameTemplate": "cargo-nextest",
-            "packageNameTemplate": "nextest-rs/nextest",
-            "datasourceTemplate": "github-releases",
-            "extractVersionTemplate": "^cargo-nextest-(?<version>.*)$",
-            "fileMatch": [
-                "(^|/)cargo-plugins\\.toml"
-            ],
+            "datasourceTemplate": "git-refs",
+            "currentValueTemplate": "main",
+            "depNameTemplate": "dotanuki-labs/callinectes",
+            "packageNameTemplate": "https://github.com/dotanuki-labs/callinectes",
+            "fileMatch": ["(^|/)krabby\\.sh$"],
             "matchStrings": [
-                "cargo-nextest\\s*=\\s*\"(?<currentValue>\\d+\\.\\d+(\\.\\d+)?)\""
-            ]
-        },
-        {
-            "customType": "regex",
-            "depNameTemplate": "cargo-cyclonedx",
-            "packageNameTemplate": "CycloneDX/cyclonedx-rust-cargo",
-            "datasourceTemplate": "github-releases",
-            "extractVersionTemplate": "^cargo-cyclonedx-(?<version>.*)$",
-            "fileMatch": [
-                "(^|/)cargo-plugins\\.toml"
-            ],
-            "matchStrings": [
-                "cargo-cyclonedx\\s*=\\s*\"(?<currentValue>\\d+\\.\\d+(\\.\\d+)?)\""
-            ]
-        },
-        {
-            "customType": "regex",
-            "depNameTemplate": "cargo-msrv",
-            "packageNameTemplate": "foresterre/cargo-msrv",
-            "datasourceTemplate": "github-releases",
-            "fileMatch": [
-                "(^|/)cargo-plugins\\.toml"
-            ],
-            "matchStrings": [
-                "cargo-msrv\\s*=\\s*\"(?<currentValue>\\d+\\.\\d+(\\.\\d+)?)\""
-            ]
-        },
-        {
-            "customType": "regex",
-            "depNameTemplate": "cargo-deny",
-            "packageNameTemplate": "EmbarkStudios/cargo-deny",
-            "datasourceTemplate": "github-releases",
-            "fileMatch": [
-                "(^|/)cargo-plugins\\.toml"
-            ],
-            "matchStrings": [
-                "cargo-deny\\s*=\\s*\"(?<currentValue>\\d+\\.\\d+(\\.\\d+)?)\""
-            ]
-        },
-        {
-            "customType": "regex",
-            "depNameTemplate": "cargo-get",
-            "packageNameTemplate": "nicolaiunrein/cargo-get",
-            "datasourceTemplate": "github-releases",
-            "fileMatch": [
-                "(^|/)cargo-plugins\\.toml"
-            ],
-            "matchStrings": [
-                "cargo-get\\s*=\\s*\"(?<currentValue>\\d+\\.\\d+(\\.\\d+)?)\""
+                "readonly callinectes=\"ghcr.io/dotanuki-labs/callinectes:(?<currentDigest>.*?)\""
             ]
         }
     ]
