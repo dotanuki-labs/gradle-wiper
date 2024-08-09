@@ -8,9 +8,10 @@ dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$dir"
 
 readonly callinectes="ghcr.io/dotanuki-labs/callinectes:6d6aa437ae154fea410d80275d890b3f5dfbcbf9"
+readonly output_dir="artifacts"
+readonly e2e_bin_home="target/e2e"
 readonly task="$1"
 readonly argument="$2"
-readonly output_dir="artifacts"
 
 usage() {
     echo
@@ -20,9 +21,9 @@ usage() {
     echo "lint              # Check code formatting and smells"
     echo "tests             # Run tests for Rust modules"
     echo "assemble          # Builds binaries according to the environment (local or CI)"
-    echo "e2e               # Runs E2E tests (local or CI)"
+    echo "e2e <target>      # Runs E2E tests against a target ('ram' or 'disk')"
     echo "security          # Run security checks and generates supply-chain artifacts"
-    echo "prepare-release   # Run security checks and generates supply-chain artifacts"
+    echo "prepare-release   # Prepare assets for Github release"
     echo
 }
 
@@ -88,9 +89,26 @@ build_binaries() {
 }
 
 e2e() {
-    echo "→ Preparing Docker image for tests"
-    ./scripts/prepare-e2e.sh
-    echo
+    echo "→ Cleaning up existing files"
+    rm -rf "$e2e_bin_home" && mkdir -p "$e2e_bin_home"
+
+    local target=
+
+    if [[ -z "$CI" ]]; then
+        echo "→ Detected environment : local machine"
+        target="aarch64-unknown-linux-gnu"
+    else
+        echo "→ Detected environment : CI machine"
+        target="x86_64-unknown-linux-gnu"
+    fi
+
+    echo "→ Building target : $target"
+    cargo build --release --target "$target"
+    local binary="target/$target/release/gradle-wiper"
+    cp "$binary" "$e2e_bin_home"/gradle-wiper
+
+    echo "→ Building Docker image for tests"
+    docker build . -t dotanuki-labs/gradle-wiper-tests -f e2e/Dockerfile
 
     echo "→ Running E2E tests"
     docker run dotanuki-labs/gradle-wiper-tests "$argument"
