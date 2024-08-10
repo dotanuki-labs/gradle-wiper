@@ -6,6 +6,15 @@ In addition, you can also check all commits that landed in a given release
 directly on
 [Github Releases](https://github.com/dotanuki-labs/gradle-wiper/releases/latest).
 
+## 0.2.0
+
+Released at **2024-08-10**
+
+### Added
+
+- Binary artifacts and SBOMs now have provenance powered by Github Actions
+- Project is now compliant with OpenSSF Best practices
+
 ## 0.1.0
 
 Released at **2024-04-29**
