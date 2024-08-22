@@ -6,6 +6,7 @@ use log::LevelFilter;
 
 pub fn setup_logging(verbose: bool) {
     setup_panic!();
+    better_panic::install();
 
     let filter = if verbose { LevelFilter::Debug } else { LevelFilter::Info };
 
