@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ 'ubuntu-22.04', 'macos-14' ]
+        os: ["ubuntu-22.04", "macos-14"]
 
     steps:
       - name: Project Checkout
@@ -48,7 +48,7 @@ jobs:
         run: cargo publish --token ${{ secrets.CRATESIO_PUBLISH_TOKEN }}
 
       - name: Check supply-chain issues
-        run: ./krabby.sh security
+        run: ./krabby.sh sbom
 
       - name: Fetch executable from previous build
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
