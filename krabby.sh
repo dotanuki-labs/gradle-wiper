@@ -23,6 +23,7 @@ usage() {
     echo "assemble          # Builds binaries according to the environment (local or CI)"
     echo "e2e <target>      # Runs E2E tests against a target ('ram' or 'disk')"
     echo "security          # Run security checks and generates supply-chain artifacts"
+    echo "sbom              # Generates cycloneDX SBOM from project dependencies"
     echo "prepare-release   # Prepare assets for Github release"
     echo
 }
@@ -37,7 +38,7 @@ check_code_smells() {
     echo
     echo "🔥 Checking code smells for Rust code"
     echo
-    docker run --rm -v "${PWD}:/usr/src" "$callinectes" code
+    docker run --rm -v "${PWD}:/usr/src" "$callinectes" fmt clippy
 }
 
 run_cargo_tests() {
@@ -119,7 +120,14 @@ check_supply_chain() {
     echo
     echo "🔥 Checking dependencies and supply-chain"
     echo
-    docker run --rm -v "${PWD}:/usr/src" "$callinectes" deps
+    docker run --rm -v "${PWD}:/usr/src" "$callinectes" msrv machete deny
+}
+
+generate_cyclonedx_sbom() {
+    echo
+    echo "🔥 Generating cycloneDX SBOM"
+    echo
+    docker run --rm -v "${PWD}:/usr/src" "$callinectes" cyclonedx
 }
 
 compute_checksums() {
@@ -163,6 +171,9 @@ case "$task" in
     ;;
 "security")
     check_supply_chain
+    ;;
+"sbom")
+    generate_cyclonedx_sbom
     ;;
 "e2e")
     e2e

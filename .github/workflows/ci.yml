@@ -25,8 +25,8 @@ jobs:
       - name: Check MIT license on source files
         uses: dotanuki-labs/github-actions/foss/check-licenses@main
         with:
-          file-patterns: '*.sh,*.rs,*.yml,*.bats,*Dockerfile'
-          license: 'mit'
+          file-patterns: "*.sh,*.rs,*.yml,*.bats,*Dockerfile"
+          license: "mit"
 
       - name: Build documentation assets
         uses: dotanuki-labs/github-actions/foss/prepare-ghpages@main
@@ -64,7 +64,7 @@ jobs:
     needs: check-docs
     strategy:
       matrix:
-        resource: [ 'disk', 'ram' ]
+        resource: ["disk", "ram"]
 
     steps:
       - name: Project Checkout
@@ -81,7 +81,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ 'ubuntu-22.04', 'macos-14' ]
+        os: ["ubuntu-22.04", "macos-14"]
 
     steps:
       - name: Project Checkout
@@ -96,8 +96,8 @@ jobs:
       - name: Archive binaries
         uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
-            name: gradle-wiper-binaries-${{ runner.os }}
-            path: artifacts
+          name: gradle-wiper-binaries-${{ runner.os }}
+          path: artifacts
 
   security-checks:
     runs-on: ubuntu-22.04
@@ -110,8 +110,11 @@ jobs:
       - name: Setup CI
         uses: ./.github/actions/setup-rust
 
-      - name: Run tests
+      - name: Run security checks
         run: ./krabby.sh security
+
+      - name: Generate SBOM
+        run: ./krabby.sh sbom
 
       - name: Archive SBOM
         uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
