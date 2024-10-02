@@ -11,7 +11,7 @@ on:
 
 jobs:
   check-docs:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Project Checkout
         uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
@@ -32,7 +32,7 @@ jobs:
         uses: dotanuki-labs/github-actions/foss/prepare-ghpages@main
 
   lint:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: check-docs
 
     steps:
@@ -46,7 +46,7 @@ jobs:
         run: ./krabby.sh lint
 
   tests:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: check-docs
 
     steps:
@@ -60,7 +60,7 @@ jobs:
         run: ./krabby.sh tests
 
   e2e:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: check-docs
     strategy:
       matrix:
@@ -81,7 +81,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ["ubuntu-22.04", "macos-14"]
+        os: ["ubuntu-24.04", "macos-14"]
 
     steps:
       - name: Project Checkout
@@ -100,7 +100,7 @@ jobs:
           path: artifacts
 
   security-checks:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [build, lint, tests, e2e]
 
     steps:
