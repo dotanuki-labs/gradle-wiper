@@ -97,13 +97,14 @@ e2e() {
 
     if [[ -z "$CI" ]]; then
         echo "→ Detected environment : local machine"
-        target="aarch64-unknown-linux-gnu"
+        target="aarch64-unknown-linux-musl"
     else
         echo "→ Detected environment : CI machine"
-        target="x86_64-unknown-linux-gnu"
+        target="x86_64-unknown-linux-musl"
     fi
 
     echo "→ Building target : $target"
+    rustup target add "$target"
     cargo build --release --target "$target"
     local binary="target/$target/release/gradle-wiper"
     cp "$binary" "$e2e_bin_home"/gradle-wiper
