@@ -94,7 +94,7 @@ jobs:
         run: ./krabby.sh assemble
 
       - name: Archive binaries
-        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
+        uses: actions/upload-artifact@604373da6381bf24206979c74d06a550515601b9 # v4.4.1
         with:
           name: gradle-wiper-binaries-${{ runner.os }}
           path: artifacts
@@ -117,7 +117,7 @@ jobs:
         run: ./krabby.sh sbom
 
       - name: Archive SBOM
-        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
+        uses: actions/upload-artifact@604373da6381bf24206979c74d06a550515601b9 # v4.4.1
         with:
           name: sbom-${{ github.sha }}.json
           path: gradle-wiper.cdx.json
