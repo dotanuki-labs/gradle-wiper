@@ -3,7 +3,6 @@
 [![OpenSSF Best](https://www.bestpractices.dev/projects/8920/badge)](https://www.bestpractices.dev/projects/8920)
 [![DeepSource](https://app.deepsource.com/gh/dotanuki-labs/gradle-wiper.svg/?label=active+issues&token=_GtR-4HW2ttd966CiJOOYEw6)](https://app.deepsource.com/gh/dotanuki-labs/gradle-wiper/)
 [![CI](https://github.com/dotanuki-labs/gradle-wiper/actions/workflows/ci.yml/badge.svg)](https://github.com/dotanuki-labs/gradle-wiper/actions/workflows/ci.yml)
-[![Rust](https://img.shields.io/badge/rustc-1.74+-FF8000.svg?logo=rust&logoColor=white)](https://rustup.rs/)
 [![Crates.io](https://img.shields.io/crates/v/gradle-wiper)](https://crates.io/crates//gradle-wiper)
 [![License](https://img.shields.io/github/license/dotanuki-labs/gradle-wiper)](https://choosealicense.com/licenses/mit)
 
