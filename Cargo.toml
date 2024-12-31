@@ -21,7 +21,7 @@ comfy-table = "7.1.1"
 directories = "5.0.1"
 human-panic = "2.0.0"
 better-panic = "0.3.0"
-itertools = "0.13.0"
+itertools = "0.14.0"
 walkdir = "2.5.0"
 uuid = { version = "1.8.0", features = ["v4"] }
 ubyte = "0.10.4"
