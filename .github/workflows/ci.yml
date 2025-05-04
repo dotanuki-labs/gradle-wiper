@@ -20,7 +20,9 @@ jobs:
         uses: dotanuki-labs/github-actions/quality/typos@main
 
       - name: Lint Markdown files
-        uses: dotanuki-labs/github-actions/quality/markdown@main
+        uses: dotanuki-labs/github-actions/quality/markdown@ufs/improve-github-context
+        with:
+          github-token: ${{ github.token }}
 
       - name: Check MIT license on source files
         uses: dotanuki-labs/github-actions/foss/check-licenses@main
