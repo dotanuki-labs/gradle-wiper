@@ -8,10 +8,10 @@ use crate::core::models::{
 };
 use crate::core::ram::find_resources_used_by_jvm;
 use crate::core::{disk, ram};
+use WipeAction::{DeepWipe, Evaluate, ShallowWipe};
 use log::debug;
 use std::path::PathBuf;
 use ubyte::ByteUnit;
-use WipeAction::{DeepWipe, Evaluate, ShallowWipe};
 
 pub fn execute(target: &MachineResource, action: WipeAction) -> anyhow::Result<ExecutionOutcome> {
     debug!("");
