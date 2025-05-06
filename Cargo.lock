@@ -906,9 +906,9 @@ dependencies = [
 
 [[package]]
 name = "temp-dir"
-version = "0.1.14"
+version = "0.1.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc1ee6eef34f12f765cb94725905c6312b6610ab2b0940889cfe58dae7bc3c72"
+checksum = "3e4d904fae635bb2c67a72badc7a0111284e3e363718486513c8c3cef4d00ce0"
 
 [[package]]
 name = "thiserror"
