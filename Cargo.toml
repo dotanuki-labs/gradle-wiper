@@ -1,7 +1,7 @@
 [package]
 name = "gradle-wiper"
 version = "0.2.0"
-edition = "2021"
+edition = "2024"
 authors = ["ubiratan.f.soares@gmail.com"]
 description = "Reclaim machine resources (RAM, Disk) attached to Gradle builds "
 repository = "https://github.com/dotanuki-labs/gradle-wiper"
@@ -12,7 +12,7 @@ categories = ["command-line-utilities"]
 keywords = ["utilities", "gradle", "clean-up", "android"]
 
 [package.metadata]
-msrv = "1.78.0"
+msrv = "1.85.1"
 
 [dependencies]
 anyhow = "1.0.82"
