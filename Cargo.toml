@@ -34,7 +34,7 @@ sysinfo = "0.35.0"
 
 [dev-dependencies]
 fake = "=4.3.0"
-temp-dir = "=0.1.15"
+temp-dir = "=0.1.16"
 
 [profile.release]
 strip = true
