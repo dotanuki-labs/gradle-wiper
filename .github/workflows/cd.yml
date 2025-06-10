@@ -65,7 +65,7 @@ jobs:
         run: ./krabby.sh prepare-release
 
       - name: Publish draft release on Github
-        uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631 # v2.2.2
+        uses: softprops/action-gh-release@d5382d3e6f2fa7bd53cb749d33091853d4985daf # v2.3.0
         with:
           name: ${{ steps.prepare-release.outputs.version }}
           tag_name: ${{ steps.prepare-release.outputs.version }}
