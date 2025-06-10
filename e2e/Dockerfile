@@ -1,7 +1,7 @@
 # Copyright 2024 Dotanuki Labs
 # SPDX-License-Identifier: MIT
 
-FROM azul/zulu-openjdk-debian:21.0.7@sha256:b1601bd813774563d997fd8d6331e092f4ee3a9d23f8508e74ed253240b77919
+FROM azul/zulu-openjdk-debian:21.0.7@sha256:6110a61c442a2ebd60ef051d28cd1478d3a2c34a960de9daea8c04c7c65cebfb
 
 RUN apt-get update && apt-get install -y git openssh-client bats --no-install-recommends
 
