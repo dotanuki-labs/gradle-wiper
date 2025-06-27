@@ -6,7 +6,7 @@ use log::LevelFilter;
 
 pub fn setup_logging(verbose: bool) {
     let homepage = "https://github.io/dotanuki-labs/gradle-wiper";
-    let support_message = format!("For issues, reach out to {}/issues", homepage);
+    let support_message = format!("For issues, reach out to {homepage}/issues");
     setup_panic!(metadata!().support(support_message.clone()).homepage(homepage));
 
     better_panic::install();

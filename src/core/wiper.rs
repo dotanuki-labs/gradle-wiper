@@ -15,8 +15,8 @@ use ubyte::ByteUnit;
 
 pub fn execute(target: &MachineResource, action: WipeAction) -> anyhow::Result<ExecutionOutcome> {
     debug!("");
-    debug!("Machine resource : {}", target);
-    debug!("Requested operation : {}", action);
+    debug!("Machine resource : {target}");
+    debug!("Requested operation : {action}");
 
     match (target, action) {
         (RamMemory, Evaluate) => evaluate_ram_memory(),
@@ -72,7 +72,7 @@ fn evaluate_disk_space() -> anyhow::Result<ExecutionOutcome> {
 
     if gradle_home.exists() {
         debug!("Gradle home : {}", &gradle_home.to_string_lossy());
-        debug!("Storage taken by Gradle caches : {}", total_size_for_gradle_home);
+        debug!("Storage taken by Gradle caches : {total_size_for_gradle_home}");
     }
 
     let maven_local_repository = disk::find_maven_local_repository(user_home.as_path());
@@ -84,7 +84,7 @@ fn evaluate_disk_space() -> anyhow::Result<ExecutionOutcome> {
             "Maven local repository path : {}",
             &maven_local_repository.to_string_lossy()
         );
-        debug!("Storage taken by Maven local : {}", total_size_for_maven_local);
+        debug!("Storage taken by Maven local : {total_size_for_maven_local}");
     }
 
     let konan_caches = disk::find_konan_caches(user_home.as_path());
@@ -93,7 +93,7 @@ fn evaluate_disk_space() -> anyhow::Result<ExecutionOutcome> {
 
     if konan_caches.exists() {
         debug!("Konan caches path : {}", &konan_caches.to_string_lossy());
-        debug!("Storage taken by Konan : {}", total_size_for_konan_caches);
+        debug!("Storage taken by Konan : {total_size_for_konan_caches}");
     }
 
     let gradle_projects = disk::find_all_gradle_projects(user_home.to_path_buf());

@@ -14,6 +14,6 @@ pub fn locate_hsperfdata_dir() -> PathBuf {
     let system_tmp_dir = std::env::temp_dir();
     let username = whoami::username();
 
-    let jvm_perf_data_dir = format!("hsperfdata_{}", username);
+    let jvm_perf_data_dir = format!("hsperfdata_{username}");
     system_tmp_dir.join(jvm_perf_data_dir)
 }

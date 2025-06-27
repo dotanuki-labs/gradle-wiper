@@ -179,7 +179,7 @@ mod tests {
 
     fn create_fake_1kb_file(gradle_home: &TempDir, folder: &str) {
         let file_name = Uuid::new_v4();
-        let relative_path = format!("{}/{}", folder, file_name);
+        let relative_path = format!("{folder}/{file_name}");
         let complete_path = gradle_home.path().join(relative_path);
 
         let faker = StringFaker::with(Vec::from(CHARS), 1000);

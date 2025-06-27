@@ -22,7 +22,7 @@ fn used_resources(resource: &MachineResource, outcome: &EvaluationOutcome) {
     let allocated = &outcome.resources;
 
     if allocated.is_empty() {
-        info!("No usages of {} related to Gradle builds were found", resource);
+        info!("No usages of {resource} related to Gradle builds were found");
         info!("");
         return;
     }
