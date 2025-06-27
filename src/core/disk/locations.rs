@@ -110,7 +110,7 @@ fn ensure_gradle_project(entry: &DirEntry) -> bool {
 
     if found {
         let raw_path = entry.path().to_str().expect("Not a valid path");
-        debug!("Found Gradle project -> {}", raw_path);
+        debug!("Found Gradle project -> {raw_path}");
     }
 
     found
