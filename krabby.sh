@@ -7,7 +7,7 @@ set -e
 dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$dir"
 
-readonly callinectes="ghcr.io/dotanuki-labs/callinectes:latest@sha256:2ef409592deae30cc71b81c390dfca0e50aa50c2f9ff3c9f1ec6b8482cea98ac"
+readonly callinectes="ghcr.io/dotanuki-labs/callinectes:latest@sha256:5fc1af953733f3939ccade9ef1203e8847e3d200cfece4f86f49894ced400bd8"
 readonly output_dir="artifacts"
 readonly e2e_bin_home="target/e2e"
 readonly task="$1"
