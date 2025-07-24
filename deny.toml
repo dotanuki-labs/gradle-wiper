@@ -10,5 +10,6 @@ allow = [
     "MIT",
     "Unicode-DFS-2016",
     "BSD-3-Clause",
-    "MPL-2.0"
+    "MPL-2.0",
+    "Zlib"
 ]
