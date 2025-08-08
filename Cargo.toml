@@ -12,7 +12,7 @@ categories = ["command-line-utilities"]
 keywords = ["utilities", "gradle", "clean-up", "android"]
 
 [package.metadata]
-msrv = "1.85.1"
+msrv = "1.89.0"
 
 [dependencies]
 anyhow = "1.0.82"
