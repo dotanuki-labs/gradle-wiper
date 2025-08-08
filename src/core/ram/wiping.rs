@@ -19,12 +19,11 @@ pub fn cleanup_memory(hsperfdata_locator: fn() -> PathBuf, caches: &[MemoryCache
 
     jvm_processes.into_iter().for_each(|(pid, launcher_class_name)| {
         let cache_type = memory_type_from_jvm_launcher_class(&launcher_class_name);
-        if caches.contains(&cache_type) {
-            if let Some(process) = system.process(Pid::from_u32(pid)) {
-                if process.kill() {
-                    debug!("Killed : {} ({})", &launcher_class_name, pid);
-                }
-            }
+        if caches.contains(&cache_type)
+            && let Some(process) = system.process(Pid::from_u32(pid))
+            && process.kill()
+        {
+            debug!("Killed : {} ({})", &launcher_class_name, pid);
         }
     })
 }
