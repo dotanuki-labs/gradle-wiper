@@ -1,6 +1,10 @@
 [advisories]
 ignore = [
-    # No advisories so far!
+    # Both better-panic and human-panic depend
+    # indirectly on
+    # https://github.com/jonas-schievink/adler
+    # which is no longer maintened
+    "RUSTSEC-2025-0056"
 ]
 
 [licenses]
