@@ -15,20 +15,20 @@ keywords = ["utilities", "gradle", "clean-up", "android"]
 msrv = "1.89.0"
 
 [dependencies]
-anyhow = "1.0.82"
-clap = { version = "4.5.4", features = ["derive"] }
-comfy-table = "7.1.1"
+anyhow = "=1.0.99"
+clap = { version = "=4.5.47", features = ["derive"] }
+comfy-table = "=7.2.0"
 directories = "6.0.0"
-human-panic = "2.0.0"
-better-panic = "0.3.0"
-itertools = "0.14.0"
-walkdir = "2.5.0"
-uuid = { version = "1.8.0", features = ["v4"] }
-ubyte = "0.10.4"
-cached = "0.56.0"
-env_logger = { version = "0.11.3", features = ["color"]}
-log = "0.4.21"
-whoami = "1.5.1"
+human-panic = "=2.0.3"
+better-panic = "=0.3.0"
+itertools = "=0.14.0"
+walkdir = "=2.5.0"
+uuid = { version = "=1.18.1", features = ["v4"] }
+ubyte = "=0.10.4"
+cached = "=0.56.0"
+env_logger = { version = "=0.11.8", features = ["color"]}
+log = "=0.4.28"
+whoami = "=1.6.1"
 rust-strings = "0.6.0"
 sysinfo = "0.37.0"
 
