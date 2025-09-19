@@ -15,7 +15,7 @@ keywords = ["utilities", "gradle", "clean-up", "android"]
 msrv = "1.89.0"
 
 [dependencies]
-anyhow = "=1.0.99"
+anyhow = "=1.0.100"
 clap = { version = "=4.5.47", features = ["derive"] }
 comfy-table = "=7.2.1"
 directories = "6.0.0"
