@@ -1,4 +1,4 @@
-# Copyright 2024 Dotanuki Labs
+# Copyright 2025 Dotanuki Labs
 # SPDX-License-Identifier: MIT
 
 FROM azul/zulu-openjdk-debian:25.0.1@sha256:4f04e350bc6bace784c99abd9a8ff30ac38c94b0050022c597e30f5a72e8a879

@@ -1,4 +1,4 @@
-# Copyright 2024 Dotanuki Labs
+# Copyright 2025 Dotanuki Labs
 # SPDX-License-Identifier: MIT
 
 name: CI
@@ -23,7 +23,7 @@ jobs:
         uses: dotanuki-labs/github-actions/quality/markdown@main
 
       - name: Check MIT license on source files
-        uses: dotanuki-labs/github-actions/foss/check-licenses@main
+        uses: korandoru/hawkeye@2f80559b06187bcd1aa7bca5138fe5e5c53e275f # v6.3.0
         with:
           file-patterns: "*.sh,*.rs,*.yml,*.bats,*Dockerfile"
           license: "mit"
