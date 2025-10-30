@@ -1,0 +1,20 @@
+# Copyright 2025 Dotanuki Labs
+# SPDX-License-Identifier: MIT
+
+inlineHeader = """
+Copyright {{props["inceptionYear"]}} {{props["copyrightOwner"]}}
+SPDX-License-Identifier: {{props["licenseSPDX"]}}
+"""
+
+includes = [
+    "*Dockerfile",
+    "**/*.rs",
+    "**/*.yml",
+    "**/*.toml",
+    "**/*.sh",
+]
+
+[properties]
+inceptionYear = 2025
+copyrightOwner = "Dotanuki Labs"
+licenseSPDX = "MIT"
