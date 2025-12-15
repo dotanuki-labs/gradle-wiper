@@ -1,0 +1,9 @@
+# Copyright 2025 Dotanuki Labs
+# SPDX-License-Identifier: MIT
+
+[global]
+disable = ["MD024"]
+
+[MD013]
+line-length = 100
+

@@ -6,5 +6,6 @@ gradle-wiper.cdx.json
 .DS_STORE
 .idea
 fleet
+.rumdl_cache
 
 
