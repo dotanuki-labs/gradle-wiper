@@ -26,7 +26,7 @@ git checkout -b ufs/release-x.y.z
 - Ensure the next release is prepared (as described above)
 - Execute the [CD Workflow](https://github.com/dotanuki-labs/gradle-wiper/actions/workflows/cd.yml)
 - Go to the [releases page](https://github.com/dotanuki-labs/gradle-wiper/releases)
-- Review the release draft and add any final touches (for instance, updating `RenovateBot` identity name)
+- Review the release draft and add any final touches
 - Publish the release 🚀
 
 ## Updating distributions
