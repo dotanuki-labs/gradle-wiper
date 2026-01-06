@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Check typos on source files
-        uses: crate-ci/typos@1a319b54cc9e3b333fed6a5c88ba1a90324da514 # v1.40.1
+        uses: crate-ci/typos@5c19779cb52ea50e151f5a10333ccd269227b5ae # v1.41.0
 
       - name: Lint Markdown files
         uses: rvben/rumdl@464ce1956cd4240c1a3f997d4e276a6f5748f0fa # v0.0.207
