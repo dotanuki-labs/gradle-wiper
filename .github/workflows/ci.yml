@@ -23,7 +23,7 @@ jobs:
         uses: rvben/rumdl@1d2d8f419b3f75cf49594b8b25d125f010fc2865 # v0.0.215
 
       - name: Check MIT license on source files
-        uses: korandoru/hawkeye@8a5eee90ee67f37a3306ef064585fb45adc26753 # v6.4.0
+        uses: korandoru/hawkeye@9f58c8ed5347f5dbe58a4a393aaea2be293d6bda # v6.4.1
         with:
           file-patterns: "*.sh,*.rs,*.yml,*.bats,*Dockerfile"
           license: "mit"
