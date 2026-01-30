@@ -33,7 +33,7 @@ env_logger = { version = "=0.11.8", features = ["color"]}
 log = "=0.4.29"
 whoami = "=2.0.2"
 rust-strings = "0.6.0"
-sysinfo = "0.37.0"
+sysinfo = "0.38.0"
 
 [dev-dependencies]
 fake = "=4.4.0"
