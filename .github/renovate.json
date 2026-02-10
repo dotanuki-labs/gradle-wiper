@@ -10,20 +10,36 @@
     "dependencyDashboard": true,
     "minimumReleaseAge": "6 days",
     "internalChecksFilter": "strict",
-    "labels": ["dependencies"],
+    "labels": [
+        "dependencies"
+    ],
     "packageRules": [
         {
-            "description": ["Rust"],
-            "matchDepNames": ["rust"],
-            "matchManagers": ["custom.regex"],
+            "description": [
+                "Rust"
+            ],
+            "matchDepNames": [
+                "rust"
+            ],
+            "matchManagers": [
+                "custom.regex"
+            ],
             "commitMessageTopic": "rust"
         },
         {
-            "matchDatasources": ["docker"],
-            "matchDepNames": ["dotanuki-labs/callinectes"],
-            "matchPackageNames": ["docker.io/dotanuki-labs/callinectes"],
+            "matchDatasources": [
+                "docker"
+            ],
+            "matchDepNames": [
+                "dotanuki-labs/callinectes"
+            ],
+            "matchPackageNames": [
+                "docker.io/dotanuki-labs/callinectes"
+            ],
             "replacementName": "ghcr.io/dotanuki-labs/callinectes",
-            "matchManagers": ["custom.regex" ]
+            "matchManagers": [
+                "custom.regex"
+            ]
         }
     ],
     "customManagers": [
@@ -32,7 +48,9 @@
             "depNameTemplate": "rust",
             "packageNameTemplate": "rust-lang/rust",
             "datasourceTemplate": "github-releases",
-            "fileMatch": ["(^|/)rust-toolchain\\.toml$"],
+            "managerFilePatterns": [
+                "/(^|/)rust-toolchain\\.toml$/"
+            ],
             "matchStrings": [
                 "channel\\s*=\\s*\"(?<currentValue>\\d+\\.\\d+(\\.\\d+)?)\""
             ]
@@ -44,7 +62,9 @@
             "registryUrlTemplate": "https://ghcr.io",
             "depNameTemplate": "dotanuki-labs/callinectes",
             "packageNameTemplate": "dotanuki-labs/callinectes",
-            "fileMatch": [ "(^|/)krabby\\.sh$"],
+            "managerFilePatterns": [
+                "/(^|/)krabby\\.sh$/"
+            ],
             "matchStrings": [
                 "readonly callinectes=\"ghcr.io/dotanuki-labs/callinectes:(?<currentValue>.*)@(?<currentDigest>sha256:[a-f0-9]+)\""
             ]
