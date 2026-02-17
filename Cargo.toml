@@ -29,7 +29,7 @@ walkdir = "=2.5.0"
 uuid = { version = "=1.20.0", features = ["v4"] }
 ubyte = "=0.10.4"
 cached = "=0.56.0"
-env_logger = { version = "=0.11.8", features = ["color"]}
+env_logger = { version = "=0.11.9", features = ["color"]}
 log = "=0.4.29"
 whoami = "=2.1.1"
 rust-strings = "0.6.0"
