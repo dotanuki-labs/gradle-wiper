@@ -19,7 +19,7 @@ msrv = "1.89.0"
 
 [dependencies]
 anyhow = "=1.0.101"
-clap = { version = "=4.5.57", features = ["derive"] }
+clap = { version = "=4.5.58", features = ["derive"] }
 comfy-table = "=7.2.2"
 directories = "6.0.0"
 human-panic = "=2.0.6"
