@@ -28,7 +28,7 @@ itertools = "=0.14.0"
 walkdir = "=2.5.0"
 uuid = { version = "=1.22.0", features = ["v4"] }
 ubyte = "=0.10.4"
-cached = "=0.58.0"
+cached = "=0.59.0"
 env_logger = { version = "=0.11.9", features = ["color"]}
 log = "=0.4.29"
 whoami = "=2.1.1"
