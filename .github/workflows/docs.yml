@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Prepare documentation assets
-        uses: dotanuki-labs/github-actions/foss/prepare-ghpages@1fdc7668770f85e16ae3a5b78eab8d60b1770253 # main
+        uses: dotanuki-labs/github-actions/foss/prepare-ghpages@46133b46b8e50009c5a8092de8e426c1989f5e56 # main
 
       - name: Deploy assets to GitHub Pages
         id: deployment
