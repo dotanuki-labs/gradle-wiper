@@ -20,7 +20,7 @@ jobs:
         uses: crate-ci/typos@57b11c6b7e54c402ccd9cda953f1072ec4f78e33 # v1.43.5
 
       - name: Lint Markdown files
-        uses: rvben/rumdl@6fd01e7192b3245aad5b6c4e62a1cea73d2e6fae # v0.1.88
+        uses: rvben/rumdl@e8c30294f7b713c7b1ffb11fb4b86e4e8b340b19 # v0.1.89
 
       - name: Check MIT license on source files
         uses: korandoru/hawkeye@c57037afedf940370c41eb660837c8aa928d472a # v6.5.1
