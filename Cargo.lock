@@ -889,9 +889,9 @@ checksum = "c08c74e62047bb2de4ff487b251e4a92e24f48745648451635cec7d591162d9f"
 
 [[package]]
 name = "rust-strings"
-version = "0.6.4"
+version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2cad2703758f100649e2c416eb914bd2dc40719a5a7b8780cd68f70e22b744b4"
+checksum = "4e71ea27279164df7a84da1bbdb4d27d9105b5602c4ba5ce63863891c8ebd36f"
 
 [[package]]
 name = "rustc-demangle"
