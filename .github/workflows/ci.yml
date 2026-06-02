@@ -29,7 +29,7 @@ jobs:
           license: "mit"
 
       - name: Build documentation assets
-        uses: dotanuki-labs/github-actions/foss/prepare-ghpages@46133b46b8e50009c5a8092de8e426c1989f5e56 # main
+        uses: dotanuki-labs/github-actions/foss/prepare-ghpages@4ca4124fb0117015aa738fbd32bf65c3e7cee153 # main
 
   lint:
     runs-on: ubuntu-24.04
@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Lint Bash scripts
-        uses: dotanuki-labs/github-actions/quality/bash@46133b46b8e50009c5a8092de8e426c1989f5e56 # main
+        uses: dotanuki-labs/github-actions/quality/bash@4ca4124fb0117015aa738fbd32bf65c3e7cee153 # main
 
       - name: Lint project
         run: ./krabby.sh lint
