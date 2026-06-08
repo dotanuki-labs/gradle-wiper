@@ -30,7 +30,7 @@ uuid = { version = "=1.23.2", features = ["v4"] }
 ubyte = "=0.10.4"
 cached = "=0.59.0"
 env_logger = { version = "=0.11.10", features = ["color"]}
-log = "=0.4.30"
+log = "=0.4.31"
 whoami = "=2.1.2"
 rust-strings = "0.6.0"
 sysinfo = "0.38.0"
